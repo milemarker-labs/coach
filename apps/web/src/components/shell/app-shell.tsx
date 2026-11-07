@@ -1,4 +1,4 @@
-import { Menu, Mountain } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { NavLink } from "react-router";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet.tsx";
@@ -9,9 +9,7 @@ import { navItems } from "./nav-items.ts";
 function Brand() {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-metal-bronze text-primary-foreground" aria-hidden="true">
-        <Mountain className="size-[18px]" strokeWidth={2.25} />
-      </span>
+      <img src="/logo.svg" alt="" width={32} height={32} draggable={false} className="size-8 shrink-0" />
       <span className="text-lg font-semibold tracking-tight text-platinum">Coach</span>
     </div>
   );

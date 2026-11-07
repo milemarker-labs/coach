@@ -6,6 +6,9 @@ import {
   formatDuration,
   heartRateLoad,
   localDate,
+  weekdayName,
+  zonedParts,
+  zonedStart,
   modalityOf,
   paceSecondsPerKm,
   personalRecords,
@@ -67,6 +70,9 @@ describe("units and classification", () => {
   it("groups by the athlete timezone rather than the local timestamp string", () => {
     expect(localDate("2026-11-01T20:30:00.000Z", "Asia/Kolkata")).toBe("2026-11-02");
     expect(weekStart("2026-11-04")).toBe("2026-11-02");
+    expect(weekdayName("2026-11-07")).toBe("Saturday");
+    expect(zonedStart("2026-11-07", "Asia/Kolkata").toISOString()).toBe("2026-11-06T18:30:00.000Z");
+    expect(zonedParts("2026-11-06T07:02:56.000Z", "Asia/Kolkata")).toEqual({ localDate: "2026-11-06", localTime: "12:32" });
   });
 });
 

@@ -66,7 +66,7 @@ aiRoutes.post("/chat", async (c) => {
   if (!conversation) return c.json({ error: "Conversation not found" }, 404);
   await db.insert(aiMessages).values({ conversationId: conversation.id, role: "user", content: parsed.data.message, sources: [] });
   const history = await loadHistory(db, conversation.id);
-  const context = await buildCoachContext(db, c.var.userId);
+  const context = await buildCoachContext(db, c.var.userId, new Date(), "Asia/Kolkata");
   const sources = context.recentActivities.map((activity) => ({
     id: activity.id,
     name: activity.name,

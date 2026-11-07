@@ -15,6 +15,11 @@ export interface CoachActivityFact {
   name: string;
   sport: string;
   startedAt: string;
+  /** Calendar date in the athlete timezone, `YYYY-MM-DD`. */
+  localDate: string;
+  /** 24-hour clock in the athlete timezone, `HH:mm`. */
+  localTime: string;
+  weekday: string;
   distanceMeters: number | null;
   movingTimeSeconds: number | null;
   averageSpeedMps: number | null;
@@ -22,6 +27,12 @@ export interface CoachActivityFact {
 }
 
 export interface CoachContext {
+  /** Calendar date in the athlete timezone, `YYYY-MM-DD`. */
+  today: string;
+  /** 24-hour clock in the athlete timezone, `HH:mm`. */
+  nowLocalTime: string;
+  weekday: string;
+  timeZone: string;
   last7Days: SportWindow[];
   previous7Days: SportWindow[];
   recentActivities: CoachActivityFact[];

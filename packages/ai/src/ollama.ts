@@ -5,6 +5,9 @@ export interface OllamaOptions {
   model: string;
 }
 
+/** Enough room for a full coaching reply. The server default was cutting answers off mid-sentence. */
+const GENERATION = { num_predict: 1536 };
+
 export function createOllamaProvider(options: OllamaOptions): AIProvider {
   const baseUrl = options.baseUrl.replace(/\/$/, "");
   return {
@@ -12,7 +15,7 @@ export function createOllamaProvider(options: OllamaOptions): AIProvider {
       const response = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ model: options.model, messages, stream: false, think: false }),
+        body: JSON.stringify({ model: options.model, messages, stream: false, think: false, options: GENERATION }),
       });
       if (!response.ok) throw new Error(ollamaError(response.status, await response.text()));
       const body = (await response.json()) as { message?: { content?: string } };
@@ -33,6 +36,7 @@ export function createOllamaProvider(options: OllamaOptions): AIProvider {
           messages,
           stream: true,
           think: false,
+          options: GENERATION,
         }),
       });
       if (!response.ok || !response.body) {
