@@ -157,6 +157,30 @@ export const coachInsightSchema = z.object({
   confidence: z.enum(["low", "medium", "high"]),
 });
 
+export const journalEntrySchema = z.object({
+  id: z.uuid(),
+  name: z.string().nullable(),
+  sportType: z.string().nullable(),
+  activityType: z.string().nullable(),
+  startDate: z.string(),
+  startDateLocal: z.string().nullable(),
+  distance: z.number().nullable(),
+  movingTime: z.number().nullable(),
+  elapsedTime: z.number().nullable(),
+  totalElevationGain: z.number().nullable(),
+  averageSpeed: z.number().nullable(),
+  averageHeartrate: z.number().nullable(),
+});
+
+export const journalSchema = z.object({
+  slug: z.literal("mangesh"),
+  name: z.string(),
+  timezone: z.string(),
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  activities: z.array(journalEntrySchema),
+});
+
 export const errorResponseSchema = z.object({
   error: z.string(),
 });
@@ -178,3 +202,5 @@ export type AiConversation = z.infer<typeof aiConversationSchema>;
 export type AthleteProfile = z.infer<typeof athleteProfileSchema>;
 export type CoachInsight = z.infer<typeof coachInsightSchema>;
 export type HistoricalSyncRequest = z.infer<typeof historicalSyncRequestSchema>;
+export type JournalEntry = z.infer<typeof journalEntrySchema>;
+export type Journal = z.infer<typeof journalSchema>;

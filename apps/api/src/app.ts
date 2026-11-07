@@ -6,6 +6,7 @@ import { aiRoutes } from "./routes/ai.ts";
 import { intelligenceRoutes } from "./routes/intelligence.ts";
 import { profileRoutes } from "./routes/profile.ts";
 import { authRoutes } from "./routes/auth.ts";
+import { journalRoutes } from "./routes/journal.ts";
 import { syncRoutes } from "./routes/sync.ts";
 import { safeErrorMessage } from "./services/errors.ts";
 
@@ -15,6 +16,7 @@ app.use("/api/*", dbMiddleware);
 
 app.get("/api/health", (c) => c.json({ ok: true }));
 app.route("/api/auth", authRoutes);
+app.route("/api/journal", journalRoutes);
 app.route("/api/sync", syncRoutes);
 app.route("/api/activities", activityRoutes);
 app.route("/api/ai", aiRoutes);

@@ -7,6 +7,7 @@ import type {
   AthleteProfile,
   AuthStatus,
   CoachInsight,
+  Journal,
   ChatRequest,
   HistoricalSyncRequest,
   SportList,
@@ -29,6 +30,7 @@ export class ApiError extends Error {
 
 export const api = {
   authStatus: () => request<AuthStatus>("/api/auth/strava/status"),
+  journal: () => request<Journal>("/api/journal/mangesh"),
   disconnect: () => request<AuthStatus>("/api/auth/strava", { method: "DELETE" }),
   syncStatus: () => request<SyncStatus>("/api/sync/status"),
   syncNow: () => request<SyncJob>("/api/sync/now", { method: "POST" }),

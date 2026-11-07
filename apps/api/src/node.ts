@@ -8,9 +8,18 @@ import type { AppBindings } from "./env.ts";
 const apiRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const env = loadBindings(apiRoot);
 
+const executionContext = {
+  waitUntil(promise: Promise<unknown>) {
+    promise.catch((error: unknown) => {
+      console.log(JSON.stringify({ event: "background_task_failed", message: error instanceof Error ? error.message : String(error) }));
+    });
+  },
+  passThroughOnException() {},
+} as ExecutionContext;
+
 serve(
   {
-    fetch: (request) => app.fetch(request, env),
+    fetch: (request) => app.fetch(request, env, executionContext),
     hostname: "127.0.0.1",
     port: Number(process.env.PORT ?? 4000),
   },

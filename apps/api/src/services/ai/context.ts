@@ -32,7 +32,17 @@ export async function buildCoachContext(db: Database, userId: string, now = new 
     sportWindow(db, userId, calendar.last7From, calendar.last7To),
     sportWindow(db, userId, calendar.previous7From, calendar.previous7To),
     db
-      .select()
+      .select({
+        id: activities.id,
+        name: activities.name,
+        sportType: activities.sportType,
+        activityType: activities.activityType,
+        startDate: activities.startDate,
+        distance: activities.distance,
+        movingTime: activities.movingTime,
+        averageSpeed: activities.averageSpeed,
+        averageHeartrate: activities.averageHeartrate,
+      })
       .from(activities)
       .where(and(eq(activities.userId, userId), gte(activities.startDate, recentStart)))
       .orderBy(desc(activities.startDate))

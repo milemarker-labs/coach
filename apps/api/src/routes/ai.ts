@@ -2,6 +2,7 @@ import { buildCoachMessages, createOllamaProvider, ollamaEndpoint, type ChatMess
 import { aiConversationSchema, aiStatusSchema, chatRequestSchema } from "@coach/shared";
 import { and, asc, desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { streamSSE } from "hono/streaming";
 import { createDatabase } from "../db/index.ts";
 import { aiConversations, aiMessages } from "../db/schema/index.ts";
 import { databaseConnectionString, type AppBindings, type AppVariables } from "../env.ts";
@@ -77,36 +78,26 @@ aiRoutes.post("/chat", async (c) => {
   const provider = createOllamaProvider(endpoint);
   const connectionString = databaseConnectionString(c.env);
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const encoder = new TextEncoder();
-      const send = (payload: unknown) => controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
-      const stored = createDatabase(connectionString);
-      let reply = "";
-      try {
-        send({ type: "meta", conversationId: conversation.id, sources });
-        for await (const delta of provider.stream(messages)) {
-          reply += delta;
-          send({ type: "delta", text: delta });
-        }
-        const content = reply.trim() || "The local model did not return a reply.";
-        await stored.db.insert(aiMessages).values({ conversationId: conversation.id, role: "assistant", content, sources });
-        await stored.db.update(aiConversations).set({ updatedAt: new Date() }).where(eq(aiConversations.id, conversation.id));
-        send({ type: "done" });
-      } catch (error) {
-        send({ type: "error", error: safeErrorMessage(error) });
-      } finally {
-        await stored.close();
-        controller.close();
+  c.header("x-accel-buffering", "no");
+  return streamSSE(c, async (stream) => {
+    c.header("cache-control", "no-cache, no-transform");
+    const stored = createDatabase(connectionString);
+    let reply = "";
+    try {
+      await stream.writeSSE({ data: JSON.stringify({ type: "meta", conversationId: conversation.id, sources }) });
+      for await (const delta of provider.stream(messages)) {
+        reply += delta;
+        await stream.writeSSE({ data: JSON.stringify({ type: "delta", text: delta }) });
       }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "content-type": "text/event-stream",
-      "cache-control": "no-cache",
-    },
+      const content = reply.trim() || "The local model did not return a reply.";
+      await stored.db.insert(aiMessages).values({ conversationId: conversation.id, role: "assistant", content, sources });
+      await stored.db.update(aiConversations).set({ updatedAt: new Date() }).where(eq(aiConversations.id, conversation.id));
+      await stream.writeSSE({ data: JSON.stringify({ type: "done" }) });
+    } catch (error) {
+      await stream.writeSSE({ data: JSON.stringify({ type: "error", error: safeErrorMessage(error) }) });
+    } finally {
+      await stored.close();
+    }
   });
 });
 

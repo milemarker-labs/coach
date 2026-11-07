@@ -30,7 +30,8 @@ export function createOllamaProvider(options: OllamaOptions): AIProvider {
     async *stream(messages: ChatMessage[]) {
       const response = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", accept: "text/event-stream" },
+        cache: "no-store",
         body: JSON.stringify({
           model: options.model,
           messages,
