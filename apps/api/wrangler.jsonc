@@ -18,17 +18,24 @@
     "run_worker_first": ["/api/*"]
   },
   "vars": {
-    "APP_ORIGIN": "ttps://coach.milemarkers.com",
+    "APP_ORIGIN": "http://localhost:3000",
     "STRAVA_CLIENT_ID": "",
     "ALLOWED_STRAVA_ATHLETE_ID": ""
   },
   "env": {
     "production": {
+      "name": "coach",
       "vars": {
-        "APP_ORIGIN": "https://coach.milemarklabs.com",
+        "APP_ORIGIN": "https://coach.milemarkerlabs.com",
         "STRAVA_CLIENT_ID": "",
         "ALLOWED_STRAVA_ATHLETE_ID": ""
       },
+      "routes": [
+        {
+          "pattern": "coach.milemarkerlabs.com",
+          "custom_domain": true
+        }
+      ],
       "hyperdrive": [
         {
           "binding": "HYPERDRIVE",
@@ -36,11 +43,5 @@
         }
       ]
     }
-  },
-  "routes": [
-    {
-      "pattern": "coach.milemarklabs.com",
-      "custom_domain": true
-    }
-  ]
+  }
 }
