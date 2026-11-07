@@ -1,0 +1,7 @@
+APP_ORIGIN=http://localhost:3000
+DATABASE_URL=postgres://user:password@host/coach?sslmode=require
+STRAVA_CLIENT_ID=
+STRAVA_CLIENT_SECRET=
+SESSION_SECRET=
+TOKEN_ENCRYPTION_KEY=
+ALLOWED_STRAVA_ATHLETE_ID=
