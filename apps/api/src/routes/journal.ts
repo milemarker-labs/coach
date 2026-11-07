@@ -25,10 +25,9 @@ const journalColumns = {
 
 journalRoutes.get("/mangesh", async (c) => {
   const db = await c.var.openDb();
-  const [userRows, profileRows] = await Promise.all([
-    db.select({ displayName: users.displayName }).from(users).where(eq(users.id, JOURNAL_USER_ID)).limit(1),
-    db.select({ timezone: athleteProfiles.timezone }).from(athleteProfiles).where(eq(athleteProfiles.userId, JOURNAL_USER_ID)).limit(1),
-  ]);
+  // One connection is open per request. Overlapping these queries deadlocks that connection on the Worker.
+  const userRows = await db.select({ displayName: users.displayName }).from(users).where(eq(users.id, JOURNAL_USER_ID)).limit(1);
+  const profileRows = await db.select({ timezone: athleteProfiles.timezone }).from(athleteProfiles).where(eq(athleteProfiles.userId, JOURNAL_USER_ID)).limit(1);
   const user = userRows[0];
   if (!user) return c.json({ error: "Not found" }, 404);
 

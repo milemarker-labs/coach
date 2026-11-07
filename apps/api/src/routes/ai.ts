@@ -85,9 +85,16 @@ aiRoutes.post("/chat", async (c) => {
     let reply = "";
     try {
       await stream.writeSSE({ data: JSON.stringify({ type: "meta", conversationId: conversation.id, sources }) });
-      for await (const delta of provider.stream(messages)) {
-        reply += delta;
-        await stream.writeSSE({ data: JSON.stringify({ type: "delta", text: delta }) });
+      if (isLoopback(endpoint.baseUrl)) {
+        for await (const delta of provider.stream(messages)) {
+          reply += delta;
+          await stream.writeSSE({ data: JSON.stringify({ type: "delta", text: delta }) });
+        }
+      } else {
+        // A Worker fetch of a streamed reply on this same zone does not deliver chunks.
+        // One finished response does arrive, which is how the model list already works.
+        reply = await answerOrTimeout(provider.complete(messages));
+        if (reply) await stream.writeSSE({ data: JSON.stringify({ type: "delta", text: reply }) });
       }
       const content = reply.trim() || "The local model did not return a reply.";
       await stored.db.insert(aiMessages).values({ conversationId: conversation.id, role: "assistant", content, sources });
@@ -100,6 +107,26 @@ aiRoutes.post("/chat", async (c) => {
     }
   });
 });
+
+function isLoopback(baseUrl: string): boolean {
+  return /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(baseUrl);
+}
+
+function answerOrTimeout(reply: Promise<string>): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("The model took too long to answer.")), 90_000);
+    reply.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
+  });
+}
 
 async function openConversation(
   db: Awaited<ReturnType<AppVariables["openDb"]>>,
