@@ -8,10 +8,65 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <meta name="theme-color" content="#101316" />
-    <title>Coach</title>
+    <title>Coach — A private training archive</title>
+    <meta
+      name="description"
+      content="Coach keeps one Strava history and turns it into load, form, and a conversation. Anyone can read the last seven days."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="describedby" href="/llms.txt" title="Agent index" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Coach" />
+    <meta property="og:url" content="https://coach.milemarkerlabs.com/" />
+    <meta property="og:title" content="Coach — A private training archive" />
+    <meta
+      property="og:description"
+      content="Coach keeps one Strava history and turns it into load, form, and a conversation. Anyone can read the last seven days."
+    />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Coach — A private training archive" />
+    <meta
+      name="twitter:description"
+      content="Coach keeps one Strava history and turns it into load, form, and a conversation. Anyone can read the last seven days."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "Coach",
+            "url": "https://coach.milemarkerlabs.com/",
+            "description": "A private training archive for one Strava athlete. The last seven days are public.",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Milemarker Labs",
+              "url": "https://milemarkerlabs.com/"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "name": "Athletic journal",
+            "url": "https://coach.milemarkerlabs.com/mangesh",
+            "description": "The last seven days of training, including rest days.",
+            "isPartOf": "https://coach.milemarkerlabs.com/"
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <article>
+        <h1>Coach</h1>
+        <p>A private training archive for one athlete. Coach keeps one Strava history and turns it into load, form, and a conversation. Anyone can read the last seven days.</p>
+        <p><a href="/mangesh">Journal</a> · <a href="/index.md">About this site</a> · <a href="/mangesh.md">How to read the journal</a> · <a href="/llms.txt">Agent index</a></p>
+      </article>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

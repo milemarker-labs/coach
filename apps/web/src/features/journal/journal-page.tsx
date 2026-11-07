@@ -1,11 +1,15 @@
 import { formatEffort, sportKey, sportLabel, type Journal, type JournalEntry } from "@coach/shared";
 import { Activity as ActivityIcon, Clock, Mountain, Route } from "lucide-react";
 import { useEffect } from "react";
+import { makeDelta } from "@/components/common/delta.tsx";
 import { EmptyState } from "@/components/common/empty-state.tsx";
 import { MetricCard } from "@/components/common/metric-card.tsx";
 import { MetricGroup } from "@/components/common/metric-group.tsx";
+import { Badge } from "@/components/ui/badge.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { SportBadge } from "@/features/activities/activity-meta.tsx";
+import { formStatus } from "@/features/analytics/calculations/load.ts";
+import { FitnessFormChart } from "@/features/analytics/charts/fitness-form-chart.tsx";
 import { PublicFrame } from "@/features/landing/public-frame.tsx";
 import { formatDistance, formatDuration, formatElevation, formatHeartRate, formatHoursMinutes } from "@/lib/format.ts";
 import { formatJournalDay, formatJournalRange, journalDays, journalTotals, type JournalDay } from "./days.ts";
@@ -57,6 +61,7 @@ function JournalBody({ data }: { data: Journal }) {
   const totals = journalTotals(data.activities);
   const days = journalDays(data);
   const kilometers = (totals.distance / 1000).toFixed(1);
+  const reading = fitnessReading(data);
 
   return (
     <div className="mt-10 space-y-10">
@@ -67,6 +72,33 @@ function JournalBody({ data }: { data: Journal }) {
         <MetricCard label="Elevation" icon={Mountain} value={Math.round(totals.elevation).toLocaleString()} unit="m" hint="Climbed" />
       </MetricGroup>
 
+      {reading ? (
+        <section className="space-y-4">
+          <MetricGroup label="Fitness, fatigue and form">
+            <MetricCard
+              label="Fitness (CTL)"
+              value={String(Math.round(reading.current.fitness))}
+              delta={makeDelta(reading.fitnessDelta, { goodWhen: "up" })}
+              hint="Change in 7 days"
+            />
+            <MetricCard
+              label="Fatigue (ATL)"
+              value={String(Math.round(reading.current.fatigue))}
+              delta={makeDelta(reading.fatigueDelta, { goodWhen: "none" })}
+              hint="Change in 7 days"
+            />
+            <MetricCard
+              label="Form (TSB)"
+              value={signed(reading.current.form)}
+              delta={makeDelta(reading.formDelta, { goodWhen: "none" })}
+              aside={<Badge tone={reading.status.tone}>{reading.status.label}</Badge>}
+              hint="Fitness minus fatigue"
+            />
+          </MetricGroup>
+          <FitnessFormChart data={data.fitness} status="ready" />
+        </section>
+      ) : null}
+
       <div>
         {days.map((day) => (
           <DaySection key={day.date} day={day} />
@@ -75,6 +107,24 @@ function JournalBody({ data }: { data: Journal }) {
       <p className="text-xs text-faint">Older sessions stay in the private archive.</p>
     </div>
   );
+}
+
+function fitnessReading(data: Journal) {
+  const current = data.fitness.at(-1);
+  const earlier = data.fitness.at(-8) ?? data.fitness[0];
+  if (!current || !earlier) return null;
+  return {
+    current,
+    fitnessDelta: current.fitness - earlier.fitness,
+    fatigueDelta: current.fatigue - earlier.fatigue,
+    formDelta: current.form - earlier.form,
+    status: formStatus(current.form),
+  };
+}
+
+function signed(value: number): string {
+  const rounded = Math.round(value);
+  return `${rounded > 0 ? "+" : ""}${rounded}`;
 }
 
 function DaySection({ day }: { day: JournalDay }) {

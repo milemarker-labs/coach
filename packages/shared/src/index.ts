@@ -13,6 +13,7 @@ export {
   errorResponseSchema,
   historicalSyncRequestSchema,
   journalEntrySchema,
+  journalFitnessPointSchema,
   journalSchema,
   sportCountSchema,
   sportListSchema,

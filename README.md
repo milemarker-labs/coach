@@ -4,6 +4,8 @@ Coach is a personal training archive for one Strava athlete. It imports every sp
 
 The site is [coach.milemarkerlabs.com](https://coach.milemarkerlabs.com). Sign-in is limited to the athlete this copy was built for. The first successful Strava connection owns the account, and a later connection from a different athlete is rejected. Anyone can read the last seven days at `/mangesh` without signing in.
 
+Agents should start at [/llms.txt](https://coach.milemarkerlabs.com/llms.txt). The home page and the journal have Markdown copies (`/index.md`, `/mangesh.md`). The live week is `GET /api/journal/mangesh`. Signed-in screens are disallowed in `robots.txt`.
+
 ## What you can do
 
 Once Strava is connected, the signed-in app has:

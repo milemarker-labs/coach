@@ -1,0 +1,51 @@
+/*
+  Content-Signal: search=yes, ai-input=yes, ai-train=yes, use=full
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/
+  Link: <https://coach.milemarkerlabs.com/>; rel="canonical", </index.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"
+
+/index.html
+  Link: <https://coach.milemarkerlabs.com/>; rel="canonical", </index.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"
+
+/mangesh
+  Link: <https://coach.milemarkerlabs.com/mangesh>; rel="canonical", </mangesh.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"
+
+/index.md
+  Content-Type: text/markdown; charset=utf-8
+  Link: <https://coach.milemarkerlabs.com/>; rel="canonical", </llms.txt>; rel="describedby"
+
+/mangesh.md
+  Content-Type: text/markdown; charset=utf-8
+  Link: <https://coach.milemarkerlabs.com/mangesh>; rel="canonical", </llms.txt>; rel="describedby"
+
+/llms.txt
+  Content-Type: text/markdown; charset=utf-8
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+
+/activities
+  X-Robots-Tag: noindex
+/activities/*
+  X-Robots-Tag: noindex
+/training
+  X-Robots-Tag: noindex
+/insights
+  X-Robots-Tag: noindex
+/coach
+  X-Robots-Tag: noindex
+/sync
+  X-Robots-Tag: noindex
+/settings
+  X-Robots-Tag: noindex
+/import
+  X-Robots-Tag: noindex
+/analytics
+  X-Robots-Tag: noindex
+/goals
+  X-Robots-Tag: noindex

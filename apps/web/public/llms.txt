@@ -1,0 +1,17 @@
+# Coach
+
+> A private training archive for one Strava athlete. The home page explains the product. The journal publishes that athlete's last seven days. Every other screen requires that athlete's sign-in.
+
+Coach is published by Milemarker Labs at https://coach.milemarkerlabs.com/. The HTML app renders in the browser, so read the Markdown pages below. The live week is JSON, not Markdown: distances are meters, durations are seconds, speed is meters per second, elevation is meters, and heart rate is beats per minute. Do not infer sessions from these files. Fetch the journal URL.
+
+Signed-in routes (`/activities`, `/training`, `/insights`, `/coach`, `/sync`, `/settings`) are empty shells without a session. Do not crawl them.
+
+## Docs
+
+- [Home](https://coach.milemarkerlabs.com/index.md): What Coach is, who can sign in, and what a visitor can read
+- [Journal](https://coach.milemarkerlabs.com/mangesh.md): How to read the public week, including the JSON fields
+- [Journal JSON](https://coach.milemarkerlabs.com/api/journal/mangesh): The last seven days, plus 90 days of fitness, fatigue, and form. No authentication. Cached for 60 seconds.
+
+## Optional
+
+- [Milemarker Labs](https://milemarkerlabs.com/llms.txt): The studio that publishes Coach

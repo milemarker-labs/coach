@@ -1,0 +1,21 @@
+# Agent index: https://coach.milemarkerlabs.com/llms.txt
+# Content signals welcome search indexing, answers grounded in this site, and model training.
+# https://contentsignals.org/
+# The public surface is the home page, the journal, and its JSON. Signed-in screens are not documents.
+
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes, use=full
+Allow: /api/journal/mangesh
+Disallow: /api/
+Disallow: /activities
+Disallow: /training
+Disallow: /insights
+Disallow: /coach
+Disallow: /sync
+Disallow: /settings
+Disallow: /import
+Disallow: /analytics
+Disallow: /goals
+Allow: /
+
+Sitemap: https://coach.milemarkerlabs.com/sitemap.xml

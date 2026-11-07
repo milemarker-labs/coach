@@ -172,6 +172,13 @@ export const journalEntrySchema = z.object({
   averageHeartrate: z.number().nullable(),
 });
 
+export const journalFitnessPointSchema = z.object({
+  day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  fitness: z.number(),
+  fatigue: z.number(),
+  form: z.number(),
+});
+
 export const journalSchema = z.object({
   slug: z.literal("mangesh"),
   name: z.string(),
@@ -179,6 +186,7 @@ export const journalSchema = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   activities: z.array(journalEntrySchema),
+  fitness: z.array(journalFitnessPointSchema),
 });
 
 export const errorResponseSchema = z.object({
