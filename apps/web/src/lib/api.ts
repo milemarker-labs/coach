@@ -5,6 +5,7 @@ import type {
   AiSource,
   AiStatus,
   AthleteProfile,
+  AthleteRoster,
   AuthStatus,
   CoachInsight,
   Journal,
@@ -30,6 +31,12 @@ export class ApiError extends Error {
 
 export const api = {
   authStatus: () => request<AuthStatus>("/api/auth/strava/status"),
+  athletes: () => request<AthleteRoster>("/api/athletes"),
+  approveAthlete: (id: string) => request<{ ok: true }>(`/api/athletes/${id}/approve`, { method: "POST" }),
+  denyAthlete: (id: string) => request<{ ok: true }>(`/api/athletes/${id}/deny`, { method: "POST" }),
+  removeAthlete: (id: string) => request<{ ok: true }>(`/api/athletes/${id}`, { method: "DELETE" }),
+  viewAthlete: (userId: string | null) =>
+    request<{ viewing: AuthStatus["viewing"] }>("/api/athletes/view", { method: "POST", body: JSON.stringify({ userId }) }),
   journal: () => request<Journal>("/api/journal/mangesh"),
   disconnect: () => request<AuthStatus>("/api/auth/strava", { method: "DELETE" }),
   syncStatus: () => request<SyncStatus>("/api/sync/status"),

@@ -26,10 +26,10 @@ export function LandingPage() {
         <div>
           <p className="text-xs font-medium tracking-[0.18em] text-accent-foreground uppercase">Personal training archive</p>
           <h1 className="mt-4 max-w-xl text-[2.5rem] leading-[1.08] font-semibold tracking-tight text-platinum sm:text-5xl">
-            A private coach for one athlete.
+            A private coach for a small roster.
           </h1>
           <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-            Coach keeps one Strava history and turns it into load, form, and a conversation. Sign in to open the archive. Anyone can read the last seven days.
+            Coach keeps each Strava history and turns it into load, form, and a conversation. The owner approves up to five athletes. Anyone can read the last seven days.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a href="/api/auth/strava" className={cn(buttonVariants(), "h-10 px-5")}>
@@ -40,9 +40,9 @@ export function LandingPage() {
             </Link>
           </div>
           <p className="mt-4 max-w-md text-xs leading-relaxed text-faint">
-            Strava sign-in is limited to the athlete this archive was built for.{" "}
-            <a href="#one-profile" className="text-titanium underline-offset-2 hover:text-platinum hover:underline">
-              Want it for your profile?
+            Connect Strava to open your archive. A new athlete waits until the owner approves.{" "}
+            <a href="#approval" className="text-titanium underline-offset-2 hover:text-platinum hover:underline">
+              How approval works
             </a>
           </p>
           {reason === "The Coach API could not be reached." ? <p className="mt-3 text-sm text-danger">Coach could not be reached just now.</p> : null}
@@ -56,30 +56,23 @@ export function LandingPage() {
           The dashboard, with a sample history.
         </h2>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-          Sign-in opens this layout for one Strava history. The sample below uses invented numbers so the shape is visible without an account: the fields Coach stores, the reading it makes from them, and the cards, chart, and note it puts on the page.
+          Sign-in opens this layout for one athlete&apos;s Strava history. The sample below uses invented numbers so the shape is visible without an account: the fields Coach stores, the reading it makes from them, and the cards, chart, and note it puts on the page.
         </p>
         <div className="mt-8">
           <SampleDashboard />
         </div>
       </section>
 
-      <section id="one-profile" className="mt-16 scroll-mt-20 border-t border-border pt-10" aria-labelledby="profile-heading">
-        <p className="text-xs font-medium tracking-[0.18em] text-accent-foreground uppercase">One profile</p>
+      <section id="approval" className="mt-16 scroll-mt-20 border-t border-border pt-10" aria-labelledby="profile-heading">
+        <p className="text-xs font-medium tracking-[0.18em] text-accent-foreground uppercase">Approval</p>
         <h2 id="profile-heading" className="mt-3 max-w-xl text-2xl font-semibold tracking-tight text-platinum sm:text-3xl">
-          This copy of Coach only works for one profile.
+          Five athletes can connect.
         </h2>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-          Connect Strava only signs in the athlete this archive was built for. The dashboard, the sync, and the coach all read that one history. A different Strava account cannot sign in. The public journal is the last seven days of the same profile.
+          Each Strava account waits for the owner. After approval, the dashboard, the sync, and the coach read that athlete&apos;s history. The owner can open any approved archive. The public journal stays the owner&apos;s last seven days.
         </p>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-          If you want Coach for your own profile, send a mail to{" "}
-          <a href="mailto:milemarkerlabs@gmail.com?subject=Coach%20for%20my%20Strava%20profile" className="font-medium text-platinum underline-offset-2 hover:underline">
-            milemarkerlabs@gmail.com
-          </a>
-          .
-        </p>
-        <a href="mailto:milemarkerlabs@gmail.com?subject=Coach%20for%20my%20Strava%20profile" className={cn(buttonVariants(), "mt-6 h-10 px-5")}>
-          Email Milemarker Labs
+        <a href="/api/auth/strava" className={cn(buttonVariants(), "mt-6 h-10 px-5")}>
+          Connect Strava
         </a>
       </section>
 

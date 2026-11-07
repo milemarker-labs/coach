@@ -2,7 +2,7 @@ import { bytesToBase64 } from "./crypto/bytes.ts";
 import { timingSafeEqual } from "./crypto/compare.ts";
 import { decryptSecret, encryptSecret } from "./crypto/tokens.ts";
 import { signSession, verifySession } from "./crypto/session.ts";
-import { decideAthleteAccess } from "./auth/athlete.ts";
+import { archiveUserId, decideAthleteAccess } from "./auth/athlete.ts";
 import { shouldRefreshToken } from "./auth/tokens.ts";
 import { activityIdentity, normalizeActivity } from "./strava/normalize.ts";
 import { readRateLimit, shouldPauseForRateLimit } from "./strava/rate-limit.ts";
@@ -96,36 +96,62 @@ describe("oauth state", () => {
   });
 });
 
-describe("athlete lock", () => {
-  it("keeps the first athlete and rejects a different one", () => {
+describe("athlete access", () => {
+  const owner = { id: "owner", role: "owner", status: "approved" };
+
+  it("creates the owner, signs a returning athlete in, and stops after five", () => {
     expect(
       decideAthleteAccess({
-        existingAthleteId: null,
+        ownerAthleteId: null,
+        knownUser: null,
         incomingAthleteId: 10n,
         allowedAthleteId: "",
-      }).ok,
-    ).toBe(true);
-    expect(
-      decideAthleteAccess({
-        existingAthleteId: 10n,
-        incomingAthleteId: 10n,
-        allowedAthleteId: "10",
-      }).ok,
-    ).toBe(true);
-    expect(
-      decideAthleteAccess({
-        existingAthleteId: 10n,
-        incomingAthleteId: 11n,
-        allowedAthleteId: "",
+        athleteCount: 0,
       }),
-    ).toEqual({ ok: false, reason: "different-athlete" });
+    ).toEqual({ ok: true, action: "create-owner" });
     expect(
       decideAthleteAccess({
-        existingAthleteId: null,
+        ownerAthleteId: null,
+        knownUser: null,
         incomingAthleteId: 11n,
         allowedAthleteId: "10",
+        athleteCount: 0,
       }),
     ).toEqual({ ok: false, reason: "allowlist" });
+    expect(
+      decideAthleteAccess({
+        ownerAthleteId: 10n,
+        knownUser: { id: "athlete-1" },
+        incomingAthleteId: 11n,
+        allowedAthleteId: "10",
+        athleteCount: 5,
+      }),
+    ).toEqual({ ok: true, action: "sign-in", userId: "athlete-1" });
+    expect(
+      decideAthleteAccess({
+        ownerAthleteId: 10n,
+        knownUser: null,
+        incomingAthleteId: 15n,
+        allowedAthleteId: "10",
+        athleteCount: 4,
+      }),
+    ).toEqual({ ok: true, action: "create-pending" });
+    expect(
+      decideAthleteAccess({
+        ownerAthleteId: 10n,
+        knownUser: null,
+        incomingAthleteId: 16n,
+        allowedAthleteId: "",
+        athleteCount: 5,
+      }),
+    ).toEqual({ ok: false, reason: "roster-full" });
+  });
+
+  it("lets the owner open an approved athlete and keeps everyone else on their own archive", () => {
+    expect(archiveUserId(owner, { id: "athlete-1", role: "athlete", status: "approved" })).toBe("athlete-1");
+    expect(archiveUserId(owner, { id: "athlete-2", role: "athlete", status: "pending" })).toBe("owner");
+    expect(archiveUserId(owner, { id: "owner", role: "owner", status: "approved" })).toBe("owner");
+    expect(archiveUserId({ id: "athlete-1", role: "athlete" }, { id: "athlete-2", role: "athlete", status: "approved" })).toBe("athlete-1");
   });
 });
 

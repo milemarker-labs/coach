@@ -1,8 +1,8 @@
 # Coach
 
-Coach is a personal training archive for one Strava athlete. It imports every sport Strava records, stores the activity summaries, and turns that history into load, form, charts, and a conversation with a local model.
+Coach is a personal training archive. It imports every sport Strava records, stores the activity summaries, and turns that history into load, form, charts, and a conversation with a local model.
 
-The site is [coach.milemarkerlabs.com](https://coach.milemarkerlabs.com). Sign-in is limited to the athlete this copy was built for. The first successful Strava connection owns the account, and a later connection from a different athlete is rejected. Anyone can read the last seven days at `/mangesh` without signing in.
+The site is [coach.milemarkerlabs.com](https://coach.milemarkerlabs.com). The first successful Strava connection becomes the owner. Up to five other athletes can connect and wait for the owner's approval, then use their own archive. The owner can also open an approved athlete's archive. Anyone can read the owner's last seven days at `/mangesh` without signing in.
 
 Agents should start at [/llms.txt](https://coach.milemarkerlabs.com/llms.txt). The home page and the journal have Markdown copies (`/index.md`, `/mangesh.md`). The live week is `GET /api/journal/mangesh`. Signed-in screens are disallowed in `robots.txt`.
 
@@ -16,7 +16,7 @@ Once Strava is connected, the signed-in app has:
 - **Insights.** Mileage, elevation, pace, and heart rate across three, six, or twelve months.
 - **Chat Coach.** A streaming conversation grounded in the stored history. The model sees rolling seven-day totals and recent summaries. It does not see raw Strava payloads or get a database connection.
 - **Data & Sync.** A historical import, then incremental syncs with a seven-day overlap. Each request pulls one page of activities. The screen keeps calling continue until the job finishes, pauses for a Strava rate limit, or fails.
-- **Settings.** The Strava connection, heart-rate thresholds, race goal, and whether the local model is reachable.
+- **Settings.** The Strava connection, athlete approvals, heart-rate thresholds, race goal, and whether the local model is reachable.
 
 Activity streams (per-kilometer splits, GPS samples) are not stored. Charts that need them stay unavailable on live data.
 

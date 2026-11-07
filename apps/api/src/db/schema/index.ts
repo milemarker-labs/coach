@@ -25,13 +25,14 @@ export const users = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     displayName: text("display_name"),
     stravaAthleteId: bigint("strava_athlete_id", { mode: "bigint" }).notNull(),
-    singleton: boolean("singleton").notNull().default(true),
+    role: text("role").notNull().default("athlete"),
+    status: text("status").notNull().default("pending"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     uniqueIndex("users_strava_athlete_id").on(table.stravaAthleteId),
-    uniqueIndex("users_one_account").on(table.singleton),
+    uniqueIndex("users_one_owner").on(table.role).where(sql`${table.role} = 'owner'`),
   ],
 );
 

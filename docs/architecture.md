@@ -1,6 +1,6 @@
 # Architecture
 
-Coach is a personal training archive for every sport Strava records. This repository currently implements the foundation: a Vite interface and a Cloudflare Worker API that connect one Strava athlete, import activity summaries, and store them in PostgreSQL.
+Coach is a personal training archive for every sport Strava records. This repository currently implements the foundation: a Vite interface and a Cloudflare Worker API that connect the owner and up to five approved athletes, import activity summaries, and store them in PostgreSQL.
 
 ## Boundaries
 
@@ -37,9 +37,9 @@ The Worker does not call `localhost:11434`. Local models, when they are added, b
 - The production model hostname is a secret. The Worker sends a Cloudflare Access service token and a bearer token. Access rejects every other caller. The stream proxy on this PC also rejects a request that lacks the bearer token.
 - The Hyperdrive id in `wrangler.jsonc` identifies the binding. It does not contain a database password.
 
-## Single athlete
+## Roster
 
-The first successful Strava connection creates the only user. A later connection with a different athlete id is rejected. `ALLOWED_STRAVA_ATHLETE_ID` can pin the allowed athlete before the site is public. The `users.singleton` column is unique so the database also holds one account. The public journal reads `JOURNAL_USER_ID` from the environment. That id is not in source.
+The first successful Strava connection becomes the owner. `ALLOWED_STRAVA_ATHLETE_ID` can pin that owner before the site is public. After the owner exists, other athletes can connect and stay pending until the owner approves them. Pending and approved athletes together are capped at five. `users.role` is `owner` or `athlete`, and a partial unique index allows one owner. `users.status` is `pending` or `approved`. The owner can point the session at an approved athlete; data routes then read that archive. The public journal reads `JOURNAL_USER_ID` from the environment. That id is not in source.
 
 ## Commands
 

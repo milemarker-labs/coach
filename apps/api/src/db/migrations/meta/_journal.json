@@ -22,6 +22,13 @@
       "when": 1794056652131,
       "tag": "0002_blushing_hitman",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794070057399,
+      "tag": "0003_athlete_roster",
+      "breakpoints": true
     }
   ]
 }

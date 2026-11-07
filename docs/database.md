@@ -8,7 +8,7 @@ Internal ids are UUIDs. Strava athlete and activity ids are `bigint` and are sen
 
 ### users
 
-One account. `strava_athlete_id` is unique. `singleton` is a boolean that defaults to true and is unique, which keeps the table to a single row.
+The owner plus up to five athletes. `strava_athlete_id` is unique. `role` is `owner` or `athlete`. `status` is `pending` or `approved`. A partial unique index on `role` where `role = 'owner'` keeps a single owner. Denying or removing an athlete deletes that row, and activities, tokens, and profiles cascade with it.
 
 ### strava_connections
 

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { useDataMode } from "@/data/mode.ts";
+import { RosterCard } from "@/features/athletes/roster-card.tsx";
 import { ModelSelector } from "@/features/coach/model-selector.tsx";
 import { api } from "@/lib/api.ts";
 import { formatInstant } from "@/lib/format.ts";
@@ -16,7 +17,8 @@ import { formatInstant } from "@/lib/format.ts";
 const errors: Record<string, string> = {
   oauth_state: "The Strava connection was interrupted. Start it again.",
   access_denied: "Strava access was not granted.",
-  athlete_locked: "This Coach is already locked to a different athlete.",
+  athlete_locked: "The first Strava connection has to be the owner of this Coach.",
+  roster_full: "Five athletes are already waiting or approved. The owner has to free a spot.",
   strava: "Strava could not complete the connection.",
 };
 
@@ -83,6 +85,7 @@ export function SettingsPage() {
         </Card>
       </div>
 
+      {auth?.role === "owner" ? <RosterCard /> : null}
       {connected ? <ProfileCard /> : null}
     </div>
   );

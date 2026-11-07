@@ -47,11 +47,40 @@ export const activityListResponseSchema = z.object({
   offset: z.number().int(),
 });
 
+export const viewedAthleteSchema = z.object({
+  userId: z.uuid(),
+  displayName: z.string().nullable(),
+  athleteId: z.string(),
+});
+
 export const authStatusSchema = z.object({
   connected: z.boolean(),
   athleteId: z.string().nullable(),
   displayName: z.string().nullable(),
   expiresAt: z.string().nullable(),
+  role: z.enum(["owner", "athlete"]).nullable(),
+  status: z.enum(["pending", "approved"]).nullable(),
+  viewing: viewedAthleteSchema.nullable(),
+});
+
+export const athleteRosterEntrySchema = z.object({
+  userId: z.uuid(),
+  displayName: z.string().nullable(),
+  athleteId: z.string(),
+  status: z.enum(["pending", "approved"]),
+});
+
+export const athleteRosterSchema = z.object({
+  athletes: z.array(athleteRosterEntrySchema),
+  limit: z.number().int(),
+});
+
+export const athleteViewRequestSchema = z.object({
+  userId: z.uuid().nullable(),
+});
+
+export const athleteViewResponseSchema = z.object({
+  viewing: viewedAthleteSchema.nullable(),
 });
 
 export const syncJobSchema = z.object({
@@ -197,6 +226,10 @@ export type ActivitySummary = z.infer<typeof activitySummarySchema>;
 export type ActivityListQuery = z.infer<typeof activityListQuerySchema>;
 export type ActivityListResponse = z.infer<typeof activityListResponseSchema>;
 export type AuthStatus = z.infer<typeof authStatusSchema>;
+export type ViewedAthlete = z.infer<typeof viewedAthleteSchema>;
+export type AthleteRosterEntry = z.infer<typeof athleteRosterEntrySchema>;
+export type AthleteRoster = z.infer<typeof athleteRosterSchema>;
+export type AthleteViewRequest = z.infer<typeof athleteViewRequestSchema>;
 export type SyncJob = z.infer<typeof syncJobSchema>;
 export type SyncJobList = z.infer<typeof syncJobListSchema>;
 export type SyncStatus = z.infer<typeof syncStatusSchema>;

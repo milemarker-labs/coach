@@ -1,6 +1,6 @@
 # API
 
-All routes are under `/api`. Protected routes require the `coach_session` cookie. Every query is scoped to that user.
+All routes are under `/api`. Protected routes require the `coach_session` cookie. Data routes read the signed-in user's archive. When the owner has chosen an approved athlete, those routes read that archive instead. A pending athlete receives `403` on data routes.
 
 ## Health
 
@@ -14,10 +14,22 @@ All routes are under `/api`. Protected routes require the `coach_session` cookie
 | --- | --- | --- | --- |
 | GET | `/api/auth/strava` | No | Redirect to Strava with a state cookie. |
 | GET | `/api/auth/strava/callback` | No | Validate state, store encrypted tokens, set the session cookie. |
-| GET | `/api/auth/strava/status` | Optional | `{ connected, athleteId, displayName, expiresAt }`. |
-| DELETE | `/api/auth/strava` | Yes | Remove stored tokens. |
+| GET | `/api/auth/strava/status` | Optional | `{ connected, athleteId, displayName, expiresAt, role, status, viewing }`. `viewing` is the approved athlete the owner has open, or null. |
+| DELETE | `/api/auth/strava` | Yes | Remove the signed-in user's stored tokens. |
 
-A state mismatch redirects to `/settings?error=oauth_state` and does not call Strava. A different athlete redirects to `/settings?error=athlete_locked`.
+A state mismatch redirects to `/settings?error=oauth_state` and does not call Strava. On an empty database, an athlete other than `ALLOWED_STRAVA_ATHLETE_ID` redirects to `/settings?error=athlete_locked`. A new athlete beyond the five spots redirects to `/settings?error=roster_full`. A pending athlete is sent to `/waiting`.
+
+## Athletes
+
+Owner only. Other signed-in users receive `403`.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/api/athletes` | Athletes besides the owner: name, Strava id, and `pending` or `approved`. Includes `limit` (5). |
+| POST | `/api/athletes/:id/approve` | Mark a pending athlete approved. |
+| POST | `/api/athletes/:id/deny` | Delete a pending athlete and their tokens. |
+| DELETE | `/api/athletes/:id` | Delete an approved athlete and their imported history. |
+| POST | `/api/athletes/view` | Body `{ userId }` sets the owner's archive, or `{ userId: null }` returns the owner to their own. |
 
 ## Sync
 

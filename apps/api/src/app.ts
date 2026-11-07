@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { AppBindings, AppVariables } from "./env.ts";
 import { dbMiddleware } from "./middleware/db.ts";
 import { activityRoutes } from "./routes/activities.ts";
+import { athleteRoutes } from "./routes/athletes.ts";
 import { aiRoutes } from "./routes/ai.ts";
 import { intelligenceRoutes } from "./routes/intelligence.ts";
 import { profileRoutes } from "./routes/profile.ts";
@@ -16,6 +17,7 @@ app.use("/api/*", dbMiddleware);
 
 app.get("/api/health", (c) => c.json({ ok: true }));
 app.route("/api/auth", authRoutes);
+app.route("/api/athletes", athleteRoutes);
 app.route("/api/journal", journalRoutes);
 app.route("/api/sync", syncRoutes);
 app.route("/api/activities", activityRoutes);

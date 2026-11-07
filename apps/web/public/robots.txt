@@ -13,6 +13,7 @@ Disallow: /insights
 Disallow: /coach
 Disallow: /sync
 Disallow: /settings
+Disallow: /waiting
 Disallow: /import
 Disallow: /analytics
 Disallow: /goals

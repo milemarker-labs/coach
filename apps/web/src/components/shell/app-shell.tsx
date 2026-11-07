@@ -2,6 +2,8 @@ import { Menu } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { NavLink } from "react-router";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet.tsx";
+import { useDataMode } from "@/data/mode.ts";
+import { AthleteSwitcher } from "@/features/athletes/athlete-switcher.tsx";
 import { StravaConnection } from "@/features/sync/strava-connection.tsx";
 import { cn } from "@/lib/utils.ts";
 import { navItems } from "./nav-items.ts";
@@ -50,6 +52,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
       <div className="px-2">
         <Brand />
       </div>
+      <AthleteSwitcher />
       <NavList onNavigate={onNavigate} />
       <div className="mt-auto">
         <StravaConnection />
@@ -60,6 +63,8 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { auth } = useDataMode();
+  const viewingName = auth?.viewing?.displayName?.trim() || "this athlete";
 
   return (
     <div className="min-h-screen">
@@ -89,7 +94,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       </Sheet>
 
       <main className="pb-20 md:pb-0 lg:pl-[250px]">
-        <div className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">{children}</div>
+        <div className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">
+          {auth?.viewing ? <p className="mb-4 text-sm text-muted-foreground">Viewing {viewingName}&apos;s archive.</p> : null}
+          {children}
+        </div>
       </main>
 
       {/* Mobile: bottom bar for the four most used sections, the drawer for the rest */}

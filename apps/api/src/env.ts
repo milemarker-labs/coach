@@ -20,7 +20,11 @@ export type AppBindings = {
 
 export type AppVariables = {
   openDb: () => Promise<Database>;
+  /** Archive being read. The owner can point this at an approved athlete. */
   userId: string;
+  /** Signed-in person. Disconnect and approvals always use this id. */
+  actorId: string;
+  role: "owner" | "athlete";
 };
 
 export function appOrigin(env: AppBindings): string {

@@ -10,7 +10,8 @@ import { CoachPage } from "@/features/coach/coach-page.tsx";
 import { DashboardPage } from "@/features/dashboard/dashboard-page.tsx";
 import { InsightsPage } from "@/features/insights/insights-page.tsx";
 import { JournalPage } from "@/features/journal/journal-page.tsx";
-import { BootScreen } from "@/features/landing/public-frame.tsx";
+import { WaitingPage } from "@/features/auth/waiting-page.tsx";
+import { BootScreen, PublicFrame } from "@/features/landing/public-frame.tsx";
 import { LandingPage } from "@/features/landing/landing-page.tsx";
 import { SettingsPage } from "@/features/settings/settings-page.tsx";
 import { SyncPage } from "@/features/sync/sync-page.tsx";
@@ -29,14 +30,20 @@ const queryClient = new QueryClient({
 const forcedDemo = import.meta.env.VITE_DEMO_DATA === "true";
 
 function AppRoutes() {
-  const { mode } = useDataMode();
+  const { mode, auth } = useDataMode();
   const signedIn = mode === "live" || forcedDemo;
+  const pending = !forcedDemo && auth?.status === "pending";
 
   return (
     <Routes>
       <Route path="/mangesh" element={<JournalPage />} />
       {mode === "loading" && !forcedDemo ? (
         <Route path="*" element={<BootScreen />} />
+      ) : pending ? (
+        <>
+          <Route path="/waiting" element={<WaitingPage />} />
+          <Route path="*" element={<Navigate to="/waiting" replace />} />
+        </>
       ) : signedIn ? (
         <Route element={<SignedInApp />}>
           <Route path="/" element={<DashboardPage />} />
@@ -55,6 +62,14 @@ function AppRoutes() {
       ) : (
         <>
           <Route path="/" element={<LandingPage />} />
+          <Route
+            path="/settings"
+            element={
+              <PublicFrame>
+                <SettingsPage />
+              </PublicFrame>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </>
       )}
