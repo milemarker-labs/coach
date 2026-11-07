@@ -11,6 +11,7 @@ import { useJournal } from "@/features/journal/use-journal.ts";
 import { formatDistance, formatDuration } from "@/lib/format.ts";
 import { cn } from "@/lib/utils.ts";
 import { PublicFrame } from "./public-frame.tsx";
+import { SampleDashboard } from "./sample-dashboard.tsx";
 
 export function LandingPage() {
   const { reason } = useDataMode();
@@ -38,13 +39,51 @@ export function LandingPage() {
               Read the journal
             </Link>
           </div>
-          <p className="mt-4 max-w-md text-xs leading-relaxed text-faint">Strava sign-in is limited to the athlete this archive was built for.</p>
+          <p className="mt-4 max-w-md text-xs leading-relaxed text-faint">
+            Strava sign-in is limited to the athlete this archive was built for.{" "}
+            <a href="#one-profile" className="text-titanium underline-offset-2 hover:text-platinum hover:underline">
+              Want it for your profile?
+            </a>
+          </p>
           {reason === "The Coach API could not be reached." ? <p className="mt-3 text-sm text-danger">Coach could not be reached just now.</p> : null}
         </div>
         <WeekPanel />
       </div>
 
-      <dl className="mt-16 grid gap-8 border-t border-border pt-10 sm:grid-cols-3 lg:mt-24">
+      <section className="mt-16 border-t border-border pt-10 lg:mt-24" aria-labelledby="dashboard-heading">
+        <p className="text-xs font-medium tracking-[0.18em] text-accent-foreground uppercase">Inside the archive</p>
+        <h2 id="dashboard-heading" className="mt-3 max-w-xl text-2xl font-semibold tracking-tight text-platinum sm:text-3xl">
+          The dashboard, with a sample history.
+        </h2>
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
+          Sign-in opens this layout for one Strava history. The sample below uses invented numbers so the shape is visible without an account: the fields Coach stores, the reading it makes from them, and the cards, chart, and note it puts on the page.
+        </p>
+        <div className="mt-8">
+          <SampleDashboard />
+        </div>
+      </section>
+
+      <section id="one-profile" className="mt-16 scroll-mt-20 border-t border-border pt-10" aria-labelledby="profile-heading">
+        <p className="text-xs font-medium tracking-[0.18em] text-accent-foreground uppercase">One profile</p>
+        <h2 id="profile-heading" className="mt-3 max-w-xl text-2xl font-semibold tracking-tight text-platinum sm:text-3xl">
+          This copy of Coach only works for one profile.
+        </h2>
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
+          Connect Strava only signs in the athlete this archive was built for. The dashboard, the sync, and the coach all read that one history. A different Strava account cannot sign in. The public journal is the last seven days of the same profile.
+        </p>
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
+          If you want Coach for your own profile, send a mail to{" "}
+          <a href="mailto:milemarkerlabs@gmail.com?subject=Coach%20for%20my%20Strava%20profile" className="font-medium text-platinum underline-offset-2 hover:underline">
+            milemarkerlabs@gmail.com
+          </a>
+          .
+        </p>
+        <a href="mailto:milemarkerlabs@gmail.com?subject=Coach%20for%20my%20Strava%20profile" className={cn(buttonVariants(), "mt-6 h-10 px-5")}>
+          Email Milemarker Labs
+        </a>
+      </section>
+
+      <dl className="mt-16 grid gap-8 border-t border-border pt-10 sm:grid-cols-3">
         <Fact title="Archive" body="Every sport Strava records, stored once and read from the same place." />
         <Fact title="Reading" body="Fitness, fatigue, and form come from the history, not from a guess." />
         <Fact title="Journal" body="The current week, rest days included, is published for anyone to read." />
