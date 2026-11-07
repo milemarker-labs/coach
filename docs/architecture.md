@@ -9,7 +9,7 @@ Coach is a personal training archive for every sport Strava records. This reposi
 - `packages/shared` holds the Zod contracts both sides compile against.
 - Analytics calculations and model providers are not in this repository yet. Route handlers must not invent training metrics or call a model.
 
-The production host is `coach.milemarklabs.com`. One Worker serves the built interface as static assets and handles `/api/*` first, so the session cookie, OAuth callback, and API share one site.
+The production host is `coach.milemarkerlabs.com`. One Worker serves the built interface as static assets and handles `/api/*` first, so the session cookie, OAuth callback, and API share one site.
 
 Locally, Vite on port 3000 proxies `/api` to a Node API on port 4000. Open `http://localhost:3000`. Set `APP_ORIGIN` to that URL so Strava returns there. The local API uses Node's Postgres driver and `DATABASE_URL`, because the Workers runtime on this machine cannot complete a TLS connection to Neon. `wrangler deploy --env production` still runs the Worker and connects through Hyperdrive.
 
@@ -33,11 +33,13 @@ The Worker does not call `localhost:11434`. Local models, when they are added, b
 - Hono on Cloudflare Workers, `nodejs_compat`, compatibility date `2026-11-07`.
 - Neon PostgreSQL. Locally the Worker uses `DATABASE_URL`. Production uses Hyperdrive via `wrangler deploy --env production`. The Worker opens a postgres.js client per request and closes it before the response finishes.
 - Drizzle migrations run from Node with `DATABASE_URL`. They do not go through Hyperdrive.
-- Secrets (`STRAVA_CLIENT_SECRET`, `SESSION_SECRET`, `TOKEN_ENCRYPTION_KEY`) are Wrangler secrets. The local Hyperdrive URL is the process environment variable `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`, loaded from `apps/api/.env` by the dev script. It is not written into `wrangler.jsonc`.
+- Secrets are Wrangler secrets, not committed variables: `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `SESSION_SECRET`, `TOKEN_ENCRYPTION_KEY`, `ALLOWED_STRAVA_ATHLETE_ID`, `JOURNAL_USER_ID`, `OLLAMA_BASE_URL`, `OLLAMA_ALLOWED_HOST`, `OLLAMA_PROXY_TOKEN`, `CF_ACCESS_CLIENT_ID`, and `CF_ACCESS_CLIENT_SECRET`. Locally the same names live in `apps/api/.dev.vars` and `apps/api/.env`, which git ignores. The local Hyperdrive URL is `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`, loaded from `apps/api/.env` by the dev script. It is not written into `wrangler.jsonc`.
+- The production model hostname is a secret. The Worker sends a Cloudflare Access service token and a bearer token. Access rejects every other caller. The stream proxy on this PC also rejects a request that lacks the bearer token.
+- The Hyperdrive id in `wrangler.jsonc` identifies the binding. It does not contain a database password.
 
 ## Single athlete
 
-The first successful Strava connection creates the only user. A later connection with a different athlete id is rejected. `ALLOWED_STRAVA_ATHLETE_ID` can pin the allowed athlete before the site is public. The `users.singleton` column is unique so the database also holds one account.
+The first successful Strava connection creates the only user. A later connection with a different athlete id is rejected. `ALLOWED_STRAVA_ATHLETE_ID` can pin the allowed athlete before the site is public. The `users.singleton` column is unique so the database also holds one account. The public journal reads `JOURNAL_USER_ID` from the environment. That id is not in source.
 
 ## Commands
 
@@ -51,7 +53,7 @@ pnpm --filter @coach/web build
 pnpm --filter @coach/api exec wrangler deploy
 ```
 
-Deploy only after Neon, Hyperdrive, the `coach.milemarklabs.com` DNS zone, and the production Strava app exist. Replace the placeholder Hyperdrive id in `apps/api/wrangler.jsonc` before deploying.
+Deploy only after Neon, Hyperdrive, the `coach.milemarkerlabs.com` DNS zone, and the production Strava app exist. The Hyperdrive binding id in `apps/api/wrangler.jsonc` has to match the Hyperdrive config for that database.
 
 Create two Strava applications. Strava stores one callback domain per app:
 

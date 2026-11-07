@@ -3,6 +3,7 @@ import type { AIProvider, ChatMessage } from "./types.ts";
 export interface OllamaOptions {
   baseUrl: string;
   model: string;
+  headers?: Record<string, string>;
 }
 
 /** Enough room for a full coaching reply. The server default was cutting answers off mid-sentence. */
@@ -10,11 +11,12 @@ const GENERATION = { num_predict: 1536 };
 
 export function createOllamaProvider(options: OllamaOptions): AIProvider {
   const baseUrl = options.baseUrl.replace(/\/$/, "");
+  const headers = options.headers;
   return {
     async complete(messages: ChatMessage[]) {
       const response = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: requestHeaders(headers, true),
         body: JSON.stringify({ model: options.model, messages, stream: false, think: false, options: GENERATION }),
       });
       if (!response.ok) throw new Error(ollamaError(response.status, await response.text()));
@@ -22,7 +24,7 @@ export function createOllamaProvider(options: OllamaOptions): AIProvider {
       return body.message?.content ?? "";
     },
     async listModels() {
-      const response = await fetch(`${baseUrl}/api/tags`);
+      const response = await fetch(`${baseUrl}/api/tags`, { headers: requestHeaders(headers, false) });
       if (!response.ok) throw new Error(`Ollama model list failed (${response.status})`);
       const body = (await response.json()) as { models?: { name?: string }[] };
       return (body.models ?? []).map((model) => model.name).filter((name): name is string => Boolean(name));
@@ -30,7 +32,7 @@ export function createOllamaProvider(options: OllamaOptions): AIProvider {
     async *stream(messages: ChatMessage[]) {
       const response = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
-        headers: { "content-type": "application/json", accept: "text/event-stream" },
+        headers: requestHeaders(headers, true, { accept: "text/event-stream" }),
         cache: "no-store",
         body: JSON.stringify({
           model: options.model,
@@ -95,6 +97,19 @@ function readChunk(line: string): { content: string; done: boolean } | null {
     done: payload.done === true,
     content: typeof message?.content === "string" ? message.content : "",
   };
+}
+
+function requestHeaders(
+  extra: Record<string, string> | undefined,
+  json: boolean,
+  more?: Record<string, string>,
+): Headers {
+  const headers = new Headers(extra);
+  if (more) {
+    for (const [key, value] of Object.entries(more)) headers.set(key, value);
+  }
+  if (json) headers.set("content-type", "application/json");
+  return headers;
 }
 
 function ollamaError(status: number, detail: string): string {

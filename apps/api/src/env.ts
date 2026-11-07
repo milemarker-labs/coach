@@ -11,6 +11,11 @@ export type AppBindings = {
   ALLOWED_STRAVA_ATHLETE_ID?: string;
   OLLAMA_BASE_URL?: string;
   OLLAMA_MODEL?: string;
+  OLLAMA_ALLOWED_HOST?: string;
+  OLLAMA_PROXY_TOKEN?: string;
+  CF_ACCESS_CLIENT_ID?: string;
+  CF_ACCESS_CLIENT_SECRET?: string;
+  JOURNAL_USER_ID?: string;
 };
 
 export type AppVariables = {

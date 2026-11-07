@@ -1,20 +1,37 @@
 import { buildCoachMessages, contentFromLine, ollamaEndpoint } from "@coach/ai";
 import { describe, expect, it } from "vitest";
 import { activityCalendar, coachCalendar } from "./context.ts";
+import { ollamaRequestHeaders } from "./endpoint.ts";
 
 describe("local model guard", () => {
-  it("accepts loopback Ollama and the model tunnel, and rejects any other host", () => {
+  it("accepts loopback Ollama and one configured https host, and rejects any other host", () => {
     expect(ollamaEndpoint({ baseUrl: "http://127.0.0.1:11434", model: "qwen3.5:9b" })).toEqual({
       baseUrl: "http://127.0.0.1:11434",
       model: "qwen3.5:9b",
     });
     expect(ollamaEndpoint({ baseUrl: "http://localhost:11434" })?.model).toBe("qwen3.5:9b");
-    expect(ollamaEndpoint({ baseUrl: "https://ollama.example.com" })?.baseUrl).toBe(
+    expect(ollamaEndpoint({ baseUrl: "https://ollama.example.com", allowedHost: "ollama.example.com" })?.baseUrl).toBe(
       "https://ollama.example.com",
     );
-    expect(ollamaEndpoint({ baseUrl: "http://ollama.example.com" })).toBeNull();
-    expect(ollamaEndpoint({ baseUrl: "https://api.openai.com" })).toBeNull();
+    expect(ollamaEndpoint({ baseUrl: "https://ollama.example.com" })).toBeNull();
+    expect(ollamaEndpoint({ baseUrl: "http://ollama.example.com", allowedHost: "ollama.example.com" })).toBeNull();
+    expect(ollamaEndpoint({ baseUrl: "https://api.openai.com", allowedHost: "ollama.example.com" })).toBeNull();
     expect(ollamaEndpoint({ baseUrl: "http://10.0.0.8:11434" })).toBeNull();
+  });
+
+  it("sends the proxy bearer token and Access service token as headers", () => {
+    expect(
+      ollamaRequestHeaders({
+        OLLAMA_PROXY_TOKEN: "proxy-token",
+        CF_ACCESS_CLIENT_ID: "client-id",
+        CF_ACCESS_CLIENT_SECRET: "client-secret",
+      }),
+    ).toEqual({
+      authorization: "Bearer proxy-token",
+      "cf-access-client-id": "client-id",
+      "cf-access-client-secret": "client-secret",
+    });
+    expect(ollamaRequestHeaders({})).toEqual({});
   });
 });
 

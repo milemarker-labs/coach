@@ -42,6 +42,11 @@ function loadBindings(root: string): AppBindings {
     DATABASE_URL: values.get("DATABASE_URL"),
     OLLAMA_BASE_URL: values.get("OLLAMA_BASE_URL") ?? "http://127.0.0.1:11434",
     OLLAMA_MODEL: values.get("OLLAMA_MODEL") ?? "qwen3.5:9b",
+    OLLAMA_ALLOWED_HOST: values.get("OLLAMA_ALLOWED_HOST") ?? "",
+    OLLAMA_PROXY_TOKEN: values.get("OLLAMA_PROXY_TOKEN") ?? "",
+    CF_ACCESS_CLIENT_ID: values.get("CF_ACCESS_CLIENT_ID") ?? "",
+    CF_ACCESS_CLIENT_SECRET: values.get("CF_ACCESS_CLIENT_SECRET") ?? "",
+    JOURNAL_USER_ID: values.get("JOURNAL_USER_ID") ?? "",
   };
 }
 

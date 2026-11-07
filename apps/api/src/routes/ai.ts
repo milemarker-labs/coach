@@ -1,4 +1,4 @@
-import { buildCoachMessages, createOllamaProvider, ollamaEndpoint, type ChatMessage } from "@coach/ai";
+import { buildCoachMessages, type ChatMessage } from "@coach/ai";
 import { aiConversationSchema, aiStatusSchema, chatRequestSchema } from "@coach/shared";
 import { and, asc, desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
@@ -8,6 +8,7 @@ import { aiConversations, aiMessages } from "../db/schema/index.ts";
 import { databaseConnectionString, type AppBindings, type AppVariables } from "../env.ts";
 import { requireUser } from "../middleware/session.ts";
 import { buildCoachContext } from "../services/ai/context.ts";
+import { coachModel } from "../services/ai/endpoint.ts";
 import { safeErrorMessage } from "../services/errors.ts";
 
 export const aiRoutes = new Hono<{ Bindings: AppBindings; Variables: AppVariables }>();
@@ -15,12 +16,12 @@ export const aiRoutes = new Hono<{ Bindings: AppBindings; Variables: AppVariable
 aiRoutes.use("*", requireUser);
 
 aiRoutes.get("/status", async (c) => {
-  const endpoint = ollamaEndpoint({ baseUrl: c.env.OLLAMA_BASE_URL, model: c.env.OLLAMA_MODEL });
+  const endpoint = coachModel(c.env);
   if (!endpoint) {
     return c.json(aiStatusSchema.parse({ provider: "ollama", model: null, reachable: false, models: [], error: "Local model is not configured." }));
   }
   try {
-    const models = await createOllamaProvider(endpoint).listModels();
+    const models = await endpoint.provider.listModels();
     const installed = models.includes(endpoint.model);
     return c.json(
       aiStatusSchema.parse({
@@ -57,7 +58,7 @@ aiRoutes.get("/conversations/latest", async (c) => {
 });
 
 aiRoutes.post("/chat", async (c) => {
-  const endpoint = ollamaEndpoint({ baseUrl: c.env.OLLAMA_BASE_URL, model: c.env.OLLAMA_MODEL });
+  const endpoint = coachModel(c.env);
   if (!endpoint) return c.json({ error: "The local model is only available when Coach is running on this machine." }, 503);
   const parsed = chatRequestSchema.safeParse(await c.req.json().catch(() => null));
   if (!parsed.success) return c.json({ error: "Invalid request" }, 400);
@@ -75,7 +76,7 @@ aiRoutes.post("/chat", async (c) => {
     startedAt: activity.startedAt,
   }));
   const messages = buildCoachMessages(context, history);
-  const provider = createOllamaProvider(endpoint);
+  const provider = endpoint.provider;
   const connectionString = databaseConnectionString(c.env);
 
   c.header("x-accel-buffering", "no");

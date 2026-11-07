@@ -51,7 +51,7 @@ Streams are not served yet. `raw_data` stays in the database.
 
 ## Local coach
 
-These routes exist only when the API is running on this machine and `OLLAMA_BASE_URL` points at `127.0.0.1` or `localhost`. The default model is `qwen3.5:9b`.
+These routes call Ollama when `OLLAMA_BASE_URL` is loopback, or when it is the https host in `OLLAMA_ALLOWED_HOST`. The default model is `qwen3.5:9b`. Production sends the Cloudflare Access service token and the proxy bearer token with each model request. A public caller cannot reach the model by opening the tunnel hostname.
 
 | Method | Path | Purpose |
 | --- | --- | --- |

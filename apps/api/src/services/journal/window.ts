@@ -1,8 +1,5 @@
 import { addDays, localDate, zonedStart } from "@coach/analytics";
 
-/** The only athlete published as a public journal. */
-export const JOURNAL_USER_ID = "00000000-0000-4000-8000-000000000001";
-
 export const JOURNAL_DAYS = 7;
 
 export const JOURNAL_TIME_ZONE = "Asia/Kolkata";

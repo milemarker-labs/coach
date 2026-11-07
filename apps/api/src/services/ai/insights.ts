@@ -1,4 +1,4 @@
-import { createOllamaProvider, ollamaEndpoint } from "@coach/ai";
+import { coachModel } from "./endpoint.ts";
 import { coachInsightSchema, type CoachInsight } from "@coach/shared";
 import { and, eq } from "drizzle-orm";
 import { aiInsights } from "../../db/schema/index.ts";
@@ -11,7 +11,7 @@ export async function cachedInsight(
   env: AppBindings,
   input: { userId: string; kind: string; subjectKey: string; context: unknown; prompt: "dashboard" | "activity"; refresh: boolean },
 ): Promise<{ insight: CoachInsight | null; error: string | null; cached: boolean }> {
-  const endpoint = ollamaEndpoint({ baseUrl: env.OLLAMA_BASE_URL, model: env.OLLAMA_MODEL });
+  const endpoint = coachModel(env);
   const contextHash = await hashContext(input.context);
   const [existing] = await db
     .select()
@@ -23,7 +23,7 @@ export async function cachedInsight(
     if (parsed.success) return { insight: filterEvidence(parsed.data, input.context), error: null, cached: true };
   }
   if (!endpoint) return { insight: null, error: "The local model is only available when Coach is running on this machine.", cached: false };
-  const provider = createOllamaProvider(endpoint);
+  const provider = endpoint.provider;
   const system = input.prompt === "dashboard" ? dashboardPrompt(input.context) : activityPrompt(input.context);
   let lastError = "The model did not return a valid coaching response.";
   for (let attempt = 0; attempt < 2; attempt += 1) {

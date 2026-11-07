@@ -18,18 +18,13 @@
     "run_worker_first": ["/api/*"]
   },
   "vars": {
-    "APP_ORIGIN": "http://localhost:3000",
-    "STRAVA_CLIENT_ID": "",
-    "ALLOWED_STRAVA_ATHLETE_ID": ""
+    "APP_ORIGIN": "http://localhost:3000"
   },
   "env": {
     "production": {
       "name": "coach",
       "vars": {
         "APP_ORIGIN": "https://coach.milemarkerlabs.com",
-        "STRAVA_CLIENT_ID": "",
-        "ALLOWED_STRAVA_ATHLETE_ID": "",
-        "OLLAMA_BASE_URL": "https://ollama.example.com",
         "OLLAMA_MODEL": "qwen3.5:9b"
       },
       "routes": [
