@@ -3,10 +3,10 @@
   "private": true,
   "packageManager": "pnpm@11.5.0",
   "scripts": {
-    "dev": "pnpm --filter @coach/shared build && pnpm --parallel --filter @coach/web --filter @coach/api dev",
-    "build": "pnpm --filter @coach/shared build && pnpm --filter @coach/web build",
+    "dev": "pnpm --filter @coach/shared build && pnpm --filter @coach/ai build && pnpm --filter @coach/analytics build && pnpm --parallel --filter @coach/web --filter @coach/api dev",
+    "build": "pnpm --filter @coach/shared build && pnpm --filter @coach/ai build && pnpm --filter @coach/analytics build && pnpm --filter @coach/web build",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm --filter @coach/shared build && pnpm --filter @coach/api test",
+    "test": "pnpm --filter @coach/shared build && pnpm --filter @coach/ai build && pnpm --filter @coach/analytics build && pnpm --filter @coach/api test",
     "db:generate": "pnpm --filter @coach/api db:generate",
     "db:migrate": "pnpm --filter @coach/api db:migrate"
   }

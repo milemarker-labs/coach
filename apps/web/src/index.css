@@ -1,47 +1,97 @@
 @import "tailwindcss";
 
+/*
+ * Titanium Noir design tokens.
+ * Every color, radius and font in the interface comes from here.
+ * Charts read the same variables through src/lib/tokens.ts.
+ */
+:root {
+  /* Surfaces: graphite and gunmetal */
+  --bg: #101316;
+  --sidebar: #191e22;
+  --surface: #22292e;
+  --surface-2: #30383d;
+  --input: #191e22;
+
+  /* Metallic neutrals */
+  --titanium: #b6bfc2;
+  --platinum: #e8e5dc;
+  --text: var(--platinum);
+  --text-secondary: var(--titanium);
+  --text-muted: #858f94;
+
+  /* Borders */
+  --border: rgba(182, 191, 194, 0.14);
+  --border-hover: rgba(182, 191, 194, 0.28);
+
+  /* Brand: champagne bronze and antique brass */
+  --bronze: #b89a69;
+  --bronze-hover: #c7ac7c;
+  --brass: #927653;
+  --bronze-subtle: rgba(184, 154, 105, 0.12);
+  --bronze-text: #d0b685;
+  /* Brushed-metal finish. Reserved for the primary action, the active nav marker and small brand marks. */
+  --metal-bronze: linear-gradient(180deg, #c4a674 0%, #b89a69 55%, #ab8e5f 100%);
+  --metal-bronze-hover: linear-gradient(180deg, #cdb182 0%, #c1a373 55%, #b59868 100%);
+
+  /* Semantic */
+  --success: #83a98b;
+  --warning: #d2a45f;
+  --danger: #d77d76;
+  --info: #83a9ba;
+  --strava: #fc4c02;
+
+  /* Chart gridlines */
+  --grid: rgba(182, 191, 194, 0.09);
+
+  --radius: 0.75rem;
+  color-scheme: dark;
+}
+
 @theme inline {
-  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Newsreader", ui-serif, Georgia, serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--bg);
+  --color-sidebar: var(--sidebar);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-surface-2: var(--surface-2);
+  --color-input: var(--input);
+  --color-popover: var(--surface-2);
+  --color-popover-foreground: var(--text);
+
+  --color-foreground: var(--text);
+  --color-muted-foreground: var(--text-secondary);
+  --color-faint: var(--text-muted);
+  --color-platinum: var(--platinum);
+  --color-titanium: var(--titanium);
+
+  --color-primary: var(--bronze);
+  --color-primary-hover: var(--bronze-hover);
+  --color-primary-subtle: var(--bronze-subtle);
+  --color-primary-foreground: #14110d;
+  --color-brass: var(--brass);
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--surface-2);
+  --color-accent: var(--bronze-subtle);
+  --color-accent-foreground: var(--bronze-text);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-destructive: var(--danger);
+  --color-info: var(--info);
+  --color-strava: var(--strava);
+
   --color-border: var(--border);
-  --color-ring: var(--ring);
+  --color-border-hover: var(--border-hover);
+  --color-ring: var(--bronze);
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-}
-
-:root {
-  --background: #f3efe6;
-  --foreground: #1c1915;
-  --card: #fbf8f3;
-  --card-foreground: #1c1915;
-  --primary: #1e4d3a;
-  --primary-foreground: #f6f3ec;
-  --secondary: #e7e0d4;
-  --secondary-foreground: #1c1915;
-  --muted: #ebe4d8;
-  --muted-foreground: #5e584e;
-  --accent: #f3d7c4;
-  --accent-foreground: #6a2e12;
-  --destructive: #9f2d2d;
-  --border: #ddd4c6;
-  --ring: #1e4d3a;
-  --radius: 0.9rem;
-  color-scheme: light;
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 @layer base {
@@ -49,20 +99,126 @@
     border-color: var(--border);
   }
 
+  html {
+    background: var(--bg);
+  }
+
   body {
     margin: 0;
     min-height: 100vh;
-    background:
-      radial-gradient(circle at top left, rgb(243 215 196 / 0.7), transparent 32rem),
-      var(--background);
-    color: var(--foreground);
+    background: var(--bg);
+    color: var(--text);
     font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: "cv11", "ss03";
+    -webkit-font-smoothing: antialiased;
   }
 
   h1,
-  h2 {
-    font-family: var(--font-serif);
-    font-weight: 500;
-    letter-spacing: -0.03em;
+  h2,
+  h3 {
+    color: var(--platinum);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  ::selection {
+    background: rgba(184, 154, 105, 0.3);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--bronze);
+    outline-offset: 2px;
+  }
+
+  input[type="date"] {
+    color-scheme: dark;
+  }
+
+  /* Slim scrollbars that sit quietly on the graphite surfaces */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(182, 191, 194, 0.25) transparent;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  /* Metric text must not jitter as digits change */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "cv11", "ss03";
+  }
+  .bg-metal-bronze {
+    background-image: var(--metal-bronze);
+  }
+  .hover\:bg-metal-bronze-hover:hover {
+    background-image: var(--metal-bronze-hover);
+  }
+}
+
+@keyframes coach-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes coach-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes coach-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes coach-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: coach-fade-in 180ms ease-out both;
+}
+
+.animate-caret {
+  animation: coach-caret 1s steps(1) infinite;
+}
+
+.animate-drawer-in {
+  animation: coach-drawer-in 200ms ease-out both;
+}
+
+.animate-overlay-in {
+  animation: coach-overlay-in 150ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

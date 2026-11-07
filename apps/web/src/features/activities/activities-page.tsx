@@ -1,140 +1,73 @@
-import { formatEffort, sportKey, sportLabel, type ActivitySummary } from "@coach/shared";
-import { useQuery } from "@tanstack/react-query";
+import { Activity } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { EmptyState } from "@/components/common/empty-state.tsx";
+import { DemoBanner } from "@/components/common/demo-banner.tsx";
+import { ListSkeleton } from "@/components/common/loading-skeleton.tsx";
+import { PageHeader } from "@/components/common/page-header.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { Label } from "@/components/ui/label.tsx";
-import { api } from "@/lib/api.ts";
-import { formatDistance, formatDuration, formatLocalClock } from "@/lib/format.ts";
+import { Card } from "@/components/ui/card.tsx";
+import { useActivityList, useSports } from "@/data/queries.ts";
+import { ActivityFilters, type ActivityFilterValue } from "./activity-filters.tsx";
+import { ActivityTable } from "./activity-table.tsx";
+
+const PAGE_SIZE = 20;
 
 export function ActivitiesPage() {
-  const [type, setType] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [sort, setSort] = useState<"asc" | "desc">("desc");
+  const [filters, setFilters] = useState<ActivityFilterValue>({ type: "", range: { from: "", to: "" }, sort: "desc" });
   const [offset, setOffset] = useState(0);
-  const limit = 20;
-  const auth = useQuery({ queryKey: ["auth"], queryFn: api.authStatus });
-  const sports = useQuery({
-    queryKey: ["sports"],
-    queryFn: api.sports,
-    enabled: auth.data?.connected === true,
-  });
-  const list = useQuery({
-    queryKey: ["activities", { type, from, to, sort, offset, limit }],
-    queryFn: () => api.activities({ type, from, to, sort, offset, limit }),
-    enabled: auth.data?.connected === true,
+  const sports = useSports();
+  const list = useActivityList({
+    ...(filters.type ? { type: filters.type } : {}),
+    ...(filters.range.from ? { from: filters.range.from } : {}),
+    ...(filters.range.to ? { to: filters.range.to } : {}),
+    sort: filters.sort,
+    offset,
+    limit: PAGE_SIZE,
   });
   const total = list.data?.total ?? 0;
+  const rows = list.data?.activities ?? [];
+  const last = Math.min(offset + PAGE_SIZE, total);
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-4xl">Activities</h1>
-        <p className="mt-2 text-muted-foreground">{total} stored activities</p>
-      </header>
-      <form
-        className="grid gap-3 md:grid-cols-4"
-        onSubmit={(event) => {
-          event.preventDefault();
+      <PageHeader title="Activities" description={list.data ? `${total.toLocaleString()} activities` : "Every activity stored in Coach"} />
+      <DemoBanner />
+      <ActivityFilters
+        value={filters}
+        sports={sports.data?.sports ?? []}
+        onChange={(next) => {
+          setFilters(next);
           setOffset(0);
         }}
-      >
-        <div className="space-y-2">
-          <Label htmlFor="sport">Sport</Label>
-          <select
-            id="sport"
-            className="h-10 w-full rounded-md border bg-card px-3 text-sm"
-            value={type}
-            onChange={(event) => {
-              setType(event.target.value);
-              setOffset(0);
-            }}
-          >
-            <option value="">All sports</option>
-            {sports.data?.sports.map((item) => (
-              <option key={item.sport} value={item.sport}>
-                {sportLabel(item.sport)} ({item.count})
-              </option>
-            ))}
-          </select>
+      />
+      <Card className="overflow-hidden">
+        {list.isLoading ? (
+          <ListSkeleton rows={8} className="px-4" />
+        ) : list.isError ? (
+          <EmptyState icon={Activity} tone="danger" title="Activities could not be loaded" description="Check that the Coach API is running, then try again." action={<Button variant="outline" size="sm" onClick={() => void list.refetch()}>Retry</Button>} />
+        ) : rows.length === 0 ? (
+          <EmptyState icon={Activity} title="No activities match" description="Widen the date range or choose another sport." />
+        ) : (
+          <div className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
+            <ActivityTable activities={rows} />
+          </div>
+        )}
+      </Card>
+      {total > PAGE_SIZE ? (
+        <div className="flex items-center justify-between gap-3">
+          <p className="num text-xs text-muted-foreground">
+            {offset + 1}–{last} of {total.toLocaleString()}
+          </p>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={offset === 0} onClick={() => setOffset((value) => Math.max(0, value - PAGE_SIZE))}>
+              Previous
+            </Button>
+            <Button variant="outline" size="sm" disabled={offset + PAGE_SIZE >= total} onClick={() => setOffset((value) => value + PAGE_SIZE)}>
+              Next
+            </Button>
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="from">From</Label>
-          <Input
-            id="from"
-            type="date"
-            value={from}
-            onChange={(event) => {
-              setFrom(event.target.value);
-              setOffset(0);
-            }}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="to">To</Label>
-          <Input
-            id="to"
-            type="date"
-            value={to}
-            onChange={(event) => {
-              setTo(event.target.value);
-              setOffset(0);
-            }}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="sort">Sort</Label>
-          <select
-            id="sort"
-            className="h-10 w-full rounded-md border bg-card px-3 text-sm"
-            value={sort}
-            onChange={(event) => {
-              setSort(event.target.value === "asc" ? "asc" : "desc");
-              setOffset(0);
-            }}
-          >
-            <option value="desc">Newest first</option>
-            <option value="asc">Oldest first</option>
-          </select>
-        </div>
-      </form>
-      <ul className="divide-y rounded-lg border bg-card">
-        {list.data?.activities.map((activity) => (
-          <li key={activity.id} className="grid gap-2 px-4 py-3 md:grid-cols-[1fr_auto]">
-            <div>
-              <Link className="font-medium underline-offset-4 hover:underline" to={`/activities/${activity.id}`}>
-                {activity.name ?? "Untitled activity"}
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                {sportLabel(sportKey(activity.sportType, activity.activityType))} · {formatLocalClock(activity.startDateLocal)}
-              </p>
-            </div>
-            <p className="font-mono text-sm">
-              {activitySummary(activity)}
-            </p>
-          </li>
-        ))}
-        {auth.data && !auth.data.connected ? <li className="px-4 py-6 text-sm text-muted-foreground">Connect Strava in settings to see activities.</li> : null}
-        {list.data && list.data.activities.length === 0 ? <li className="px-4 py-6 text-sm text-muted-foreground">No activities match these filters.</li> : null}
-      </ul>
-      <div className="flex items-center gap-3">
-        <Button variant="outline" disabled={offset === 0} onClick={() => setOffset((value) => Math.max(0, value - limit))}>
-          Previous
-        </Button>
-        <Button variant="outline" disabled={offset + limit >= total} onClick={() => setOffset((value) => value + limit)}>
-          Next
-        </Button>
-      </div>
+      ) : null}
     </div>
   );
-}
-
-function activitySummary(activity: ActivitySummary): string {
-  const sport = sportKey(activity.sportType, activity.activityType);
-  const effort = formatEffort(sport, activity.averageSpeed);
-  const parts = [formatDistance(activity.distance), formatDuration(activity.movingTime)];
-  if (effort.value !== "—") parts.push(effort.value);
-  return parts.join(" · ");
 }

@@ -120,6 +120,11 @@ export async function getSyncJob(db: Database, userId: string, jobId: string): P
   return job ? serializeJob(job) : null;
 }
 
+export async function listSyncJobs(db: Database, userId: string, limit: number): Promise<SyncJobResponse[]> {
+  const rows = await db.select().from(syncJobs).where(eq(syncJobs.userId, userId)).orderBy(desc(syncJobs.createdAt)).limit(limit);
+  return rows.map(serializeJob);
+}
+
 export async function getSyncStatus(db: Database, userId: string) {
   const jobs = await db
     .select()

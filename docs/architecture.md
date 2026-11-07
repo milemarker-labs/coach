@@ -13,6 +13,15 @@ The production host is `coach.milemarklabs.com`. One Worker serves the built int
 
 Locally, Vite on port 3000 proxies `/api` to a Node API on port 4000. Open `http://localhost:3000`. Set `APP_ORIGIN` to that URL so Strava returns there. The local API uses Node's Postgres driver and `DATABASE_URL`, because the Workers runtime on this machine cannot complete a TLS connection to Neon. `wrangler deploy --env production` still runs the Worker and connects through Hyperdrive.
 
+## Web interface
+
+The interface uses the Titanium Noir design system. Its tokens are CSS variables in `apps/web/src/index.css`; charts read the same variables through `src/lib/tokens.ts`. Champagne bronze is the only brand accent. Semantic colors (success, warning, danger, information) are kept apart from it.
+
+- `src/data` holds data access. `mode.ts` decides between `live` (Strava connected) and `demo` (not connected, API unreachable, or `VITE_DEMO_DATA=true`). Demo activities are generated in `src/data/mock`, have the API's exact shape, and are always announced by a banner. They are never mixed with live data.
+- `src/features/analytics/calculations` holds pure functions: weekly and monthly volume, training load, fitness/fatigue/form, pace and heart rate series, activity comparison. They have unit tests (`pnpm --filter @coach/web test`). Components never calculate.
+- Training load is the Strava suffer score when an activity has one, otherwise one point per moving minute. The charts state how much of a figure is estimated.
+- Per-kilometer splits are not stored by the API yet, so live activities show an unavailable state. Only demo activities have splits.
+
 ## Data path
 
 Strava summaries are normalized in TypeScript, then upserted on `(user_id, strava_activity_id)`. A repeated import updates the existing row. Historical import fetches one page of 200 activities per request and stores the next page on the job. The import screen calls continue until the job completes, pauses for a rate limit, or fails. Incremental sync uses the same job runner with a seven-day overlap.

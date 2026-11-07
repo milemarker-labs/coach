@@ -9,6 +9,8 @@ export type AppBindings = {
   SESSION_SECRET: string;
   TOKEN_ENCRYPTION_KEY: string;
   ALLOWED_STRAVA_ATHLETE_ID?: string;
+  OLLAMA_BASE_URL?: string;
+  OLLAMA_MODEL?: string;
 };
 
 export type AppVariables = {

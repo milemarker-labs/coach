@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "node ./scripts/dev.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@coach/ai": "workspace:*",
+    "@coach/analytics": "workspace:*",
     "@coach/shared": "workspace:*",
     "@hono/node-server": "^2.1.6",
     "drizzle-orm": "^0.45.4",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261106.1",
+    "@types/node": "^24.19.2",
     "drizzle-kit": "^0.31.11",
     "typescript": "~7.0.2",
     "vitest": "^5.1.0",

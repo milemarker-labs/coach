@@ -27,6 +27,7 @@ export function useJobRunner(jobId: string | null) {
           void queryClient.invalidateQueries({ queryKey: ["sync-status"] });
           void queryClient.invalidateQueries({ queryKey: ["activities"] });
           void queryClient.invalidateQueries({ queryKey: ["sports"] });
+          void queryClient.invalidateQueries({ queryKey: ["sync-jobs"] });
         })
         .catch((caught: unknown) => {
           if (caught instanceof ApiError && caught.status === 409) {

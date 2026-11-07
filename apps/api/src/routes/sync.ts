@@ -7,6 +7,7 @@ import {
   continueSyncJob,
   getSyncJob,
   getSyncStatus,
+  listSyncJobs,
   startHistoricalSync,
   startIncrementalSync,
   type JobAction,
@@ -33,6 +34,11 @@ syncRoutes.post("/historical", async (c) => {
   const db = await c.var.openDb();
   const result = await startHistoricalSync(syncContext(c, db), parsed.data);
   return jobResponse(c, result);
+});
+
+syncRoutes.get("/jobs", async (c) => {
+  const db = await c.var.openDb();
+  return c.json({ jobs: await listSyncJobs(db, c.var.userId, 20) });
 });
 
 syncRoutes.get("/jobs/:id", async (c) => {

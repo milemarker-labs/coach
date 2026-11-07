@@ -15,9 +15,16 @@ export interface NormalizedActivity {
   maxHeartrate: number | null;
   averageCadence: number | null;
   averageWatts: number | null;
+  weightedAverageWatts: number | null;
+  maxWatts: number | null;
+  kilojoules: number | null;
+  deviceWatts: boolean | null;
   calories: number | null;
   sufferScore: number | null;
   averageTemp: number | null;
+  hasHeartrate: boolean | null;
+  trainer: boolean | null;
+  commute: boolean | null;
   gearId: string | null;
   rawData: Record<string, unknown>;
 }
@@ -45,9 +52,16 @@ export function normalizeActivity(raw: unknown): NormalizedActivity {
     maxHeartrate: numberOrNull(raw.max_heartrate),
     averageCadence: numberOrNull(raw.average_cadence),
     averageWatts: numberOrNull(raw.average_watts),
+    weightedAverageWatts: numberOrNull(raw.weighted_average_watts),
+    maxWatts: numberOrNull(raw.max_watts),
+    kilojoules: numberOrNull(raw.kilojoules),
+    deviceWatts: booleanOrNull(raw.device_watts),
     calories: numberOrNull(raw.calories),
     sufferScore: intOrNull(raw.suffer_score),
     averageTemp: numberOrNull(raw.average_temp),
+    hasHeartrate: booleanOrNull(raw.has_heartrate),
+    trainer: booleanOrNull(raw.trainer),
+    commute: booleanOrNull(raw.commute),
     gearId: stringOrNull(raw.gear_id),
     rawData: raw,
   };
@@ -98,6 +112,10 @@ function stringOrNull(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function booleanOrNull(value: unknown): boolean | null {
+  return typeof value === "boolean" ? value : null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

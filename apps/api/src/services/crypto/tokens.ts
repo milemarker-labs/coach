@@ -23,7 +23,7 @@ export async function decryptSecret(payload: string, keyBase64: string): Promise
   return new TextDecoder().decode(plain);
 }
 
-async function importAesKey(keyBase64: string): Promise<CryptoKey> {
+async function importAesKey(keyBase64: string) {
   const raw = base64ToBytes(keyBase64);
   if (raw.byteLength !== 32) {
     throw new Error("TOKEN_ENCRYPTION_KEY must decode to 32 bytes");

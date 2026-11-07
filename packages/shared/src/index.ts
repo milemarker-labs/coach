@@ -1,4 +1,11 @@
 export {
+  aiConversationSchema,
+  aiMessageSchema,
+  aiSourceSchema,
+  aiStatusSchema,
+  chatRequestSchema,
+  athleteProfileSchema,
+  coachInsightSchema,
   activityListQuerySchema,
   activityListResponseSchema,
   activitySummarySchema,
@@ -7,6 +14,7 @@ export {
   historicalSyncRequestSchema,
   sportCountSchema,
   sportListSchema,
+  syncJobListSchema,
   syncJobSchema,
   syncStatusSchema,
 } from "./schemas.js";
@@ -25,6 +33,13 @@ export {
 export type { EffortKind } from "./sport.js";
 
 export type {
+  AiConversation,
+  AiMessage,
+  AiSource,
+  AiStatus,
+  ChatRequest,
+  AthleteProfile,
+  CoachInsight,
   ActivityListQuery,
   ActivityListResponse,
   ActivitySummary,
@@ -33,5 +48,6 @@ export type {
   SportCount,
   SportList,
   SyncJob,
+  SyncJobList,
   SyncStatus,
 } from "./schemas.js";

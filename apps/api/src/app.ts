@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import type { AppBindings, AppVariables } from "./env.ts";
 import { dbMiddleware } from "./middleware/db.ts";
 import { activityRoutes } from "./routes/activities.ts";
+import { aiRoutes } from "./routes/ai.ts";
+import { intelligenceRoutes } from "./routes/intelligence.ts";
+import { profileRoutes } from "./routes/profile.ts";
 import { authRoutes } from "./routes/auth.ts";
 import { syncRoutes } from "./routes/sync.ts";
 import { safeErrorMessage } from "./services/errors.ts";
@@ -14,6 +17,9 @@ app.get("/api/health", (c) => c.json({ ok: true }));
 app.route("/api/auth", authRoutes);
 app.route("/api/sync", syncRoutes);
 app.route("/api/activities", activityRoutes);
+app.route("/api/ai", aiRoutes);
+app.route("/api/profile", profileRoutes);
+app.route("/api/intelligence", intelligenceRoutes);
 
 app.notFound((c) => c.json({ error: "Not found" }, 404));
 

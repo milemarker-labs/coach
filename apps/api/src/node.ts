@@ -31,6 +31,8 @@ function loadBindings(root: string): AppBindings {
     TOKEN_ENCRYPTION_KEY: values.get("TOKEN_ENCRYPTION_KEY") ?? "",
     ALLOWED_STRAVA_ATHLETE_ID: values.get("ALLOWED_STRAVA_ATHLETE_ID") ?? "",
     DATABASE_URL: values.get("DATABASE_URL"),
+    OLLAMA_BASE_URL: values.get("OLLAMA_BASE_URL") ?? "http://127.0.0.1:11434",
+    OLLAMA_MODEL: values.get("OLLAMA_MODEL") ?? "qwen3.5:9b",
   };
 }
 

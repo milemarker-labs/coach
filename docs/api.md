@@ -26,6 +26,7 @@ A state mismatch redirects to `/settings?error=oauth_state` and does not call St
 | GET | `/api/sync/status` | Active job, latest failed job, last successful log time, activity count. |
 | POST | `/api/sync/now` | Start a seven-day incremental sync and process the first page. |
 | POST | `/api/sync/historical` | Start a historical import. Body: optional `after` and `before` as `YYYY-MM-DD`. |
+| GET | `/api/sync/jobs` | The 20 most recent sync jobs, newest first. Feeds the sync history list. |
 | GET | `/api/sync/jobs/:id` | Job detail. |
 | POST | `/api/sync/jobs/:id/continue` | Process one page, or resume a failed job from its cursor. |
 | POST | `/api/sync/jobs/:id/cancel` | Cancel a pending, running, or failed job. |
@@ -47,3 +48,15 @@ A page shorter than 200 activities completes the job. A full page advances `curs
 Query parameters: `type`, `from`, `to`, `sort` (`asc` or `desc`), `limit` (1–100), `offset`. `type` matches `sport_type` or `activity_type`. Dates are inclusive `YYYY-MM-DD` against `start_date`. The list response is `{ activities, total, limit, offset }`.
 
 Streams are not served yet. `raw_data` stays in the database.
+
+## Local coach
+
+These routes exist only when the API is running on this machine and `OLLAMA_BASE_URL` points at `127.0.0.1` or `localhost`. The default model is `qwen3.5:9b`.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/api/ai/status` | Whether Ollama is reachable and the model is installed. |
+| GET | `/api/ai/conversations/latest` | The newest conversation. |
+| POST | `/api/ai/chat` | Send a message. The response is a server-sent event stream. |
+
+The model receives rolling seven-day totals and recent activity summaries computed in the API. It does not receive raw Strava payloads or a database connection.

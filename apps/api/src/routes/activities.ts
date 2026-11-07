@@ -97,9 +97,16 @@ function serializeActivity(row: typeof activities.$inferSelect) {
     maxHeartrate: row.maxHeartrate,
     averageCadence: row.averageCadence,
     averageWatts: row.averageWatts,
+    weightedAverageWatts: row.weightedAverageWatts,
+    maxWatts: row.maxWatts,
+    kilojoules: row.kilojoules,
+    deviceWatts: row.deviceWatts,
     calories: row.calories,
     sufferScore: row.sufferScore,
     averageTemp: row.averageTemp,
+    hasHeartrate: row.hasHeartrate,
+    trainer: row.trainer,
+    commute: row.commute,
     gearId: row.gearId,
   };
 }
