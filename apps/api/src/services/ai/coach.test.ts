@@ -3,12 +3,16 @@ import { describe, expect, it } from "vitest";
 import { activityCalendar, coachCalendar } from "./context.ts";
 
 describe("local model guard", () => {
-  it("accepts loopback Ollama and rejects any other host", () => {
+  it("accepts loopback Ollama and the model tunnel, and rejects any other host", () => {
     expect(ollamaEndpoint({ baseUrl: "http://127.0.0.1:11434", model: "qwen3.5:9b" })).toEqual({
       baseUrl: "http://127.0.0.1:11434",
       model: "qwen3.5:9b",
     });
     expect(ollamaEndpoint({ baseUrl: "http://localhost:11434" })?.model).toBe("qwen3.5:9b");
+    expect(ollamaEndpoint({ baseUrl: "https://ollama.example.com" })?.baseUrl).toBe(
+      "https://ollama.example.com",
+    );
+    expect(ollamaEndpoint({ baseUrl: "http://ollama.example.com" })).toBeNull();
     expect(ollamaEndpoint({ baseUrl: "https://api.openai.com" })).toBeNull();
     expect(ollamaEndpoint({ baseUrl: "http://10.0.0.8:11434" })).toBeNull();
   });
