@@ -28,26 +28,25 @@ export function coachCalendar(now: Date, timeZone: string) {
 export async function buildCoachContext(db: Database, userId: string, now = new Date(), timeZone = "Asia/Kolkata"): Promise<CoachContext> {
   const calendar = coachCalendar(now, timeZone);
   const recentStart = new Date(now.getTime() - 90 * DAY_MS);
-  const [last7Days, previous7Days, recent] = await Promise.all([
-    sportWindow(db, userId, calendar.last7From, calendar.last7To),
-    sportWindow(db, userId, calendar.previous7From, calendar.previous7To),
-    db
-      .select({
-        id: activities.id,
-        name: activities.name,
-        sportType: activities.sportType,
-        activityType: activities.activityType,
-        startDate: activities.startDate,
-        distance: activities.distance,
-        movingTime: activities.movingTime,
-        averageSpeed: activities.averageSpeed,
-        averageHeartrate: activities.averageHeartrate,
-      })
-      .from(activities)
-      .where(and(eq(activities.userId, userId), gte(activities.startDate, recentStart)))
-      .orderBy(desc(activities.startDate))
-      .limit(20),
-  ]);
+  // One connection is open per request. Overlapping queries deadlock that connection on the Worker.
+  const last7Days = await sportWindow(db, userId, calendar.last7From, calendar.last7To);
+  const previous7Days = await sportWindow(db, userId, calendar.previous7From, calendar.previous7To);
+  const recent = await db
+    .select({
+      id: activities.id,
+      name: activities.name,
+      sportType: activities.sportType,
+      activityType: activities.activityType,
+      startDate: activities.startDate,
+      distance: activities.distance,
+      movingTime: activities.movingTime,
+      averageSpeed: activities.averageSpeed,
+      averageHeartrate: activities.averageHeartrate,
+    })
+    .from(activities)
+    .where(and(eq(activities.userId, userId), gte(activities.startDate, recentStart)))
+    .orderBy(desc(activities.startDate))
+    .limit(20);
 
   return {
     today: calendar.today,
