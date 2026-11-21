@@ -10,7 +10,8 @@ Agents should start at [/llms.txt](https://coach.milemarkerlabs.com/llms.txt). T
 
 Once Strava is connected, the signed-in app has:
 
-- **Dashboard.** This week against the one before it: distance, time, elevation, recent sessions, training load, and a short coach note.
+- **The Marker.** One 0–100 number for where fitness stands, read from the logs: base (42-day load, 35%), consistency (25%), balance of acute to chronic load (20%), momentum (10%) and aerobic efficiency (10%, needs heart rate). Missing parts are re-weighted, never counted as zero. It comes with a 90-day trend, **today's call** (rest, easy, steady, quality or long, with a suggested duration from the athlete's own typical session) and up to four **directions**. The engine is `packages/shared/src/score.ts`; the name lives in `SCORE_NAME`. See [docs/score.md](docs/score.md).
+- **Dashboard ("Today").** The Marker, today's call and directions, then this week against the one before it: distance, time, elevation, recent sessions, training load, and a short coach note. `Ctrl/⌘ K` opens a palette to jump between screens, find a session, or ask the coach.
 - **Activities.** Every imported sport, filtered by type and date, with a detail page for one session.
 - **Training.** Fitness, fatigue, and form from the stored load, plus a longer view of how the weeks are going.
 - **Insights.** Mileage, elevation, pace, and heart rate across three, six, or twelve months.

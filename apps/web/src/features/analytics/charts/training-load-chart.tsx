@@ -1,9 +1,10 @@
 import { Activity } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { chartAxis, chartColors } from "@/lib/tokens.ts";
+import { chartAxis, chartColors, chartMotion } from "@/lib/tokens.ts";
 import { formatDayLong, formatDayShort, formatWeekday } from "../calculations/dates.ts";
 import { estimatedShare, type DailyLoad } from "../calculations/load.ts";
 import { ChartCard, type ChartStatus } from "./chart-card.tsx";
+import { ChartDefs, haloDot, useChartIds } from "./chart-defs.tsx";
 import { ChartTooltip } from "./chart-tooltip.tsx";
 
 export function TrainingLoadChart({
@@ -21,6 +22,7 @@ export function TrainingLoadChart({
   height?: number;
   className?: string;
 }) {
+  const ids = useChartIds();
   const hasLoad = data.some((day) => day.load > 0);
   const share = estimatedShare(data);
   const short = data.length <= 8;
@@ -42,11 +44,12 @@ export function TrainingLoadChart({
     >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
-          <CartesianGrid vertical={false} stroke={chartColors.grid} />
+          <ChartDefs ids={ids} />
+          <CartesianGrid vertical={false} stroke={chartColors.grid} strokeDasharray="2 6" />
           <XAxis dataKey="day" {...chartAxis} tickFormatter={short ? formatWeekday : formatDayShort} minTickGap={24} />
           <YAxis {...chartAxis} width={40} allowDecimals={false} />
           <Tooltip
-            cursor={{ stroke: chartColors.cursor }}
+            cursor={{ stroke: chartColors.cursor, strokeDasharray: "3 3" }}
             content={(props) => (
               <ChartTooltip<DailyLoad>
                 active={props.active}
@@ -66,11 +69,12 @@ export function TrainingLoadChart({
             type="monotone"
             dataKey="load"
             stroke={chartColors.primary}
-            strokeWidth={2}
-            fill={chartColors.primary}
-            fillOpacity={0.14}
-            activeDot={{ r: 4, fill: chartColors.primary, stroke: chartColors.surface, strokeWidth: 2 }}
-            isAnimationActive={false}
+            strokeWidth={2.5}
+            fill={`url(#${ids.area})`}
+            filter={`url(#${ids.glow})`}
+            dot={short ? { r: 3, fill: chartColors.primary, stroke: "var(--bg)", strokeWidth: 2 } : false}
+            activeDot={haloDot(chartColors.primary)}
+            {...chartMotion}
           />
         </AreaChart>
       </ResponsiveContainer>

@@ -19,6 +19,7 @@ export {
   journalEntrySchema,
   journalFitnessPointSchema,
   journalSchema,
+  journalScoreSchema,
   sportCountSchema,
   sportListSchema,
   syncJobListSchema,
@@ -39,6 +40,39 @@ export {
 
 export type { EffortKind } from "./sport.js";
 
+export {
+  SCORE_BANDS,
+  SCORE_DESCRIPTIONS,
+  SCORE_LABELS,
+  SCORE_NAME,
+  SCORE_VERSION,
+  SCORE_WEIGHTS,
+  balanceScore,
+  bandFor,
+  baseScore,
+  computeMarker,
+  consistencyScore,
+  efficiencyScore,
+  momentumScore,
+  scoreLoad,
+  todayCall,
+} from "./score.js";
+
+export type {
+  CallKind,
+  Direction,
+  DirectionTone,
+  MarkerScore,
+  ScoreActivity,
+  ScoreBand,
+  ScoreBandKey,
+  ScoreComponent,
+  ScoreComponentKey,
+  ScoreOptions,
+  ScoreTrendPoint,
+  TodayCall,
+} from "./score.js";
+
 export type {
   AiConversation,
   AiMessage,
@@ -58,6 +92,7 @@ export type {
   HistoricalSyncRequest,
   Journal,
   JournalEntry,
+  JournalScore,
   SportCount,
   SportList,
   SyncJob,

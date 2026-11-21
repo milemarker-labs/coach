@@ -33,12 +33,19 @@ export function ModelSelector({
       </div>
     );
   }
+  const dot = loading ? "bg-faint" : reachable ? "bg-success" : "bg-danger";
   return (
-    <div className="inline-flex h-8 max-w-full items-center gap-2 rounded-lg border border-border bg-card px-3 text-xs" title={reachable ? "The model runs on this computer" : "The model is not reachable"}>
-      <Cpu className="size-3.5 shrink-0 text-titanium" aria-hidden="true" />
-      <span className="truncate font-medium text-platinum">{loading ? "Checking model" : (value ?? "No model configured")}</span>
-      <span className={cn("size-1.5 shrink-0 rounded-full", loading ? "bg-faint" : reachable ? "bg-success" : "bg-danger")} aria-hidden="true" />
-      <span className="sr-only">{reachable ? "Reachable" : "Not reachable"}</span>
+    <div
+      className="glass inline-flex h-9 max-w-full items-center gap-2 rounded-full border border-border px-3.5 text-xs"
+      title={reachable ? "The model runs on this computer" : "The model is not reachable"}
+    >
+      <Cpu className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <span className={cn("truncate font-medium", loading ? "text-muted-foreground" : "text-foreground")}>{loading ? "Checking model" : (value ?? "No model configured")}</span>
+      <span className="relative flex size-2 shrink-0" aria-hidden="true">
+        {!loading ? <span className={cn("animate-ping-soft absolute inset-0 rounded-full", dot)} /> : null}
+        <span className={cn("relative size-2 rounded-full", dot, loading && "animate-pulse")} />
+      </span>
+      <span className="sr-only">{loading ? "Checking" : reachable ? "Reachable" : "Not reachable"}</span>
     </div>
   );
 }

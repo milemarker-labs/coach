@@ -2,10 +2,11 @@ import { Gauge } from "lucide-react";
 import { CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { ReactNode } from "react";
 import { formatClock, formatDistance } from "@/lib/format.ts";
-import { chartAxis, chartColors } from "@/lib/tokens.ts";
+import { chartAxis, chartColors, chartMotion } from "@/lib/tokens.ts";
 import { formatDayLong, formatDayShort } from "../calculations/dates.ts";
 import type { EffortPoint, EffortSeries } from "../calculations/effort.ts";
 import { ChartCard, type ChartStatus } from "./chart-card.tsx";
+import { ChartDefs, haloDot, useChartIds } from "./chart-defs.tsx";
 import { ChartTooltip } from "./chart-tooltip.tsx";
 
 function unitFor(kind: EffortSeries["kind"]): string {
@@ -34,6 +35,7 @@ export function PaceChart({
   className?: string;
   actions?: ReactNode;
 }) {
+  const ids = useChartIds();
   const kind = series?.kind ?? "pace";
   const points = series?.points ?? [];
   const reversed = kind !== "speed";
@@ -53,7 +55,8 @@ export function PaceChart({
     >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
-          <CartesianGrid vertical={false} stroke={chartColors.grid} />
+          <ChartDefs ids={ids} />
+          <CartesianGrid vertical={false} stroke={chartColors.grid} strokeDasharray="2 6" />
           <XAxis dataKey="day" {...chartAxis} tickFormatter={formatDayShort} minTickGap={36} />
           <YAxis
             {...chartAxis}
@@ -63,7 +66,7 @@ export function PaceChart({
             tickFormatter={(value: number) => formatValue(kind, value)}
           />
           <Tooltip
-            cursor={{ stroke: chartColors.cursor }}
+            cursor={{ stroke: chartColors.cursor, strokeDasharray: "3 3" }}
             content={(props) => (
               <ChartTooltip<EffortPoint>
                 active={props.active}
@@ -85,11 +88,21 @@ export function PaceChart({
             type="linear"
             dataKey="value"
             stroke="transparent"
-            dot={{ r: 3, fill: chartColors.secondary, fillOpacity: 0.7, stroke: "none" }}
-            activeDot={{ r: 5, fill: chartColors.secondary, stroke: chartColors.surface, strokeWidth: 2 }}
-            isAnimationActive={false}
+            dot={{ r: 3.5, fill: chartColors.secondary, fillOpacity: 0.55, stroke: "none" }}
+            activeDot={haloDot(chartColors.secondary)}
+            {...chartMotion}
           />
-          <Line type="monotone" dataKey="trend" stroke={chartColors.primary} strokeWidth={2} dot={false} activeDot={false} connectNulls isAnimationActive={false} />
+          <Line
+            type="monotone"
+            dataKey="trend"
+            stroke={`url(#${ids.line})`}
+            strokeWidth={2.75}
+            filter={`url(#${ids.glow})`}
+            dot={false}
+            activeDot={false}
+            connectNulls
+            {...chartMotion}
+          />
         </ComposedChart>
       </ResponsiveContainer>
     </ChartCard>

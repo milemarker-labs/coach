@@ -1,4 +1,4 @@
-import { journalSchema } from "@coach/shared";
+import { computeMarker, journalSchema, sportKey } from "@coach/shared";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { Hono } from "hono";
 import { activities, athleteProfiles, users } from "../db/schema/index.ts";
@@ -29,6 +29,11 @@ const fitnessColumns = {
   startDateLocal: activities.startDateLocal,
   movingTime: activities.movingTime,
   sufferScore: activities.sufferScore,
+  sportType: activities.sportType,
+  activityType: activities.activityType,
+  distance: activities.distance,
+  averageSpeed: activities.averageSpeed,
+  averageHeartrate: activities.averageHeartrate,
 };
 
 journalRoutes.get("/mangesh", async (c) => {
@@ -61,6 +66,19 @@ journalRoutes.get("/mangesh", async (c) => {
     )
     .limit(4000);
 
+  const marker = computeMarker(
+    loadRows.map((row) => ({
+      day: journalLoadDay(row.startDate, row.startDateLocal),
+      sport: sportKey(row.sportType, row.activityType),
+      sufferScore: row.sufferScore,
+      movingTime: row.movingTime,
+      distance: row.distance,
+      averageSpeed: row.averageSpeed,
+      averageHeartrate: row.averageHeartrate,
+    })),
+    window.toDate,
+  );
+
   c.header("Cache-Control", "public, max-age=60");
   c.header("Content-Signal", "search=yes, ai-input=yes, ai-train=yes, use=full");
   c.header("Link", '</llms.txt>; rel="describedby", </mangesh.md>; rel="describedby"');
@@ -80,6 +98,16 @@ journalRoutes.get("/mangesh", async (c) => {
         })),
         window.toDate,
       ),
+      // The number and its parts only. Today's call and the directions stay in the private archive.
+      score: {
+        name: marker.name,
+        value: marker.value,
+        band: { key: marker.band.key, label: marker.band.label },
+        delta7: marker.delta7,
+        confidence: marker.confidence,
+        components: marker.components.map(({ key, label, value, detail }) => ({ key, label, value, detail })),
+        trend: marker.trend,
+      },
     }),
   );
 });

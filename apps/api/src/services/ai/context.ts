@@ -1,6 +1,6 @@
 import { addDays, weekdayName, zonedParts, zonedStart } from "@coach/analytics";
 import type { CoachContext } from "@coach/ai";
-import { sportKey } from "@coach/shared";
+import { computeMarker, sportKey } from "@coach/shared";
 import { and, count, desc, eq, gte, lt, sql } from "drizzle-orm";
 import type { Database } from "../../db/index.ts";
 import { activities } from "../../db/schema/index.ts";
@@ -48,6 +48,34 @@ export async function buildCoachContext(db: Database, userId: string, now = new 
     .orderBy(desc(activities.startDate))
     .limit(20);
 
+  // A year of loads for the Marker score. Sequential, like every query on this connection.
+  const loads = await db
+    .select({
+      startDate: activities.startDate,
+      sportType: activities.sportType,
+      activityType: activities.activityType,
+      sufferScore: activities.sufferScore,
+      movingTime: activities.movingTime,
+      distance: activities.distance,
+      averageSpeed: activities.averageSpeed,
+      averageHeartrate: activities.averageHeartrate,
+    })
+    .from(activities)
+    .where(and(eq(activities.userId, userId), gte(activities.startDate, new Date(now.getTime() - 365 * DAY_MS))))
+    .limit(4000);
+  const marker = computeMarker(
+    loads.map((row) => ({
+      day: activityCalendar(row.startDate, timeZone).localDate,
+      sport: sportKey(row.sportType, row.activityType),
+      sufferScore: row.sufferScore,
+      movingTime: row.movingTime,
+      distance: row.distance,
+      averageSpeed: row.averageSpeed,
+      averageHeartrate: row.averageHeartrate,
+    })),
+    calendar.today,
+  );
+
   return {
     today: calendar.today,
     nowLocalTime: calendar.nowLocalTime,
@@ -71,6 +99,15 @@ export async function buildCoachContext(db: Database, userId: string, now = new 
         averageHeartRate: activity.averageHeartrate,
       };
     }),
+    marker: {
+      name: marker.name,
+      value: marker.value,
+      band: marker.band.label,
+      delta7: marker.delta7,
+      components: marker.components.map(({ label, value, detail }) => ({ label, value, detail })),
+      call: { kind: marker.call.kind, title: marker.call.title, reason: marker.call.reason, minutes: marker.call.minutes },
+      directions: marker.directions.map(({ title, detail }) => ({ title, detail })),
+    },
   };
 }
 

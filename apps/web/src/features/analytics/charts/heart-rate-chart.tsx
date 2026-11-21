@@ -1,10 +1,11 @@
 import { HeartPulse } from "lucide-react";
 import type { ReactNode } from "react";
 import { CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { chartAxis, chartColors } from "@/lib/tokens.ts";
+import { chartAxis, chartColors, chartMotion } from "@/lib/tokens.ts";
 import { formatDayLong, formatDayShort } from "../calculations/dates.ts";
 import type { HeartRatePoint } from "../calculations/effort.ts";
 import { ChartCard, type ChartStatus } from "./chart-card.tsx";
+import { ChartDefs, haloDot, useChartIds } from "./chart-defs.tsx";
 import { ChartTooltip } from "./chart-tooltip.tsx";
 
 export function HeartRateChart({
@@ -22,6 +23,7 @@ export function HeartRateChart({
   className?: string;
   actions?: ReactNode;
 }) {
+  const ids = useChartIds();
   return (
     <ChartCard
       title="Heart rate trend"
@@ -37,19 +39,20 @@ export function HeartRateChart({
     >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
-          <CartesianGrid vertical={false} stroke={chartColors.grid} />
+          <ChartDefs ids={ids} />
+          <CartesianGrid vertical={false} stroke={chartColors.grid} strokeDasharray="2 6" />
           <XAxis dataKey="day" {...chartAxis} tickFormatter={formatDayShort} minTickGap={36} />
           <YAxis {...chartAxis} width={40} domain={[(min: number) => Math.floor(min - 6), (max: number) => Math.ceil(max + 6)]} allowDecimals={false} />
           <Legend
             verticalAlign="top"
             align="right"
             height={24}
-            iconType="plainline"
-            iconSize={12}
+            iconType="circle"
+            iconSize={7}
             formatter={(value: string) => <span className="text-xs text-muted-foreground">{value}</span>}
           />
           <Tooltip
-            cursor={{ stroke: chartColors.cursor }}
+            cursor={{ stroke: chartColors.cursor, strokeDasharray: "3 3" }}
             content={(props) => (
               <ChartTooltip<HeartRatePoint>
                 active={props.active}
@@ -71,12 +74,23 @@ export function HeartRateChart({
             type="linear"
             dataKey="average"
             stroke="transparent"
-            dot={{ r: 3, fill: chartColors.secondary, fillOpacity: 0.7, stroke: "none" }}
-            activeDot={{ r: 5, fill: chartColors.secondary, stroke: chartColors.surface, strokeWidth: 2 }}
+            dot={{ r: 3.5, fill: chartColors.secondary, fillOpacity: 0.55, stroke: "none" }}
+            activeDot={haloDot(chartColors.secondary)}
             legendType="circle"
-            isAnimationActive={false}
+            {...chartMotion}
           />
-          <Line name="5-activity average" type="monotone" dataKey="trend" stroke={chartColors.primary} strokeWidth={2} dot={false} activeDot={false} connectNulls isAnimationActive={false} />
+          <Line
+            name="5-activity average"
+            type="monotone"
+            dataKey="trend"
+            stroke={chartColors.primary}
+            strokeWidth={2.5}
+            filter={`url(#${ids.glow})`}
+            dot={false}
+            activeDot={false}
+            connectNulls
+            {...chartMotion}
+          />
         </ComposedChart>
       </ResponsiveContainer>
     </ChartCard>

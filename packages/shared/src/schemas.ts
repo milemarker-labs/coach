@@ -208,6 +208,17 @@ export const journalFitnessPointSchema = z.object({
   form: z.number(),
 });
 
+/** The public slice of the Marker score: the number and what it is made of, not the private directions. */
+export const journalScoreSchema = z.object({
+  name: z.string(),
+  value: z.number(),
+  band: z.object({ key: z.string(), label: z.string() }),
+  delta7: z.number().nullable(),
+  confidence: z.enum(["low", "medium", "high"]),
+  components: z.array(z.object({ key: z.string(), label: z.string(), value: z.number().nullable(), detail: z.string() })),
+  trend: z.array(z.object({ day: z.string(), value: z.number() })),
+});
+
 export const journalSchema = z.object({
   slug: z.literal("mangesh"),
   name: z.string(),
@@ -216,6 +227,8 @@ export const journalSchema = z.object({
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   activities: z.array(journalEntrySchema),
   fitness: z.array(journalFitnessPointSchema),
+  /** Added with the Marker. Optional so an older API still validates. */
+  score: journalScoreSchema.optional(),
 });
 
 export const errorResponseSchema = z.object({
@@ -245,3 +258,4 @@ export type CoachInsight = z.infer<typeof coachInsightSchema>;
 export type HistoricalSyncRequest = z.infer<typeof historicalSyncRequestSchema>;
 export type JournalEntry = z.infer<typeof journalEntrySchema>;
 export type Journal = z.infer<typeof journalSchema>;
+export type JournalScore = z.infer<typeof journalScoreSchema>;

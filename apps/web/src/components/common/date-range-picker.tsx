@@ -1,3 +1,5 @@
+import { CalendarRange } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input.tsx";
 import { Select } from "@/components/ui/select.tsx";
@@ -42,11 +44,13 @@ export function DateRangePicker({
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-      <div className="sm:w-44">
+      <div className="relative sm:w-48">
+        <CalendarRange className="pointer-events-none absolute top-1/2 left-3 z-10 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <Select
           id={id}
           aria-label="Date range"
           value={active}
+          className="rounded-full bg-card/60 pl-8 text-xs font-semibold"
           onChange={(event) => {
             const next = event.target.value as Preset;
             if (next === "custom") {
@@ -64,13 +68,21 @@ export function DateRangePicker({
           ))}
         </Select>
       </div>
-      {showInputs ? (
-        <div className="flex items-center gap-2">
-          <Input type="date" aria-label="From date" value={value.from} max={value.to || undefined} onChange={(event) => onChange({ ...value, from: event.target.value })} />
-          <span className="text-xs text-muted-foreground">to</span>
-          <Input type="date" aria-label="To date" value={value.to} min={value.from || undefined} onChange={(event) => onChange({ ...value, to: event.target.value })} />
-        </div>
-      ) : null}
+      <AnimatePresence initial={false}>
+        {showInputs ? (
+          <motion.div
+            className="flex items-center gap-2 overflow-hidden"
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            exit={{ opacity: 0, width: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Input type="date" aria-label="From date" className="rounded-full" value={value.from} max={value.to || undefined} onChange={(event) => onChange({ ...value, from: event.target.value })} />
+            <span className="text-xs text-muted-foreground">to</span>
+            <Input type="date" aria-label="To date" className="rounded-full" value={value.to} min={value.from || undefined} onChange={(event) => onChange({ ...value, to: event.target.value })} />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

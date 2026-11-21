@@ -1,9 +1,10 @@
 import { Layers } from "lucide-react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatClock } from "@/lib/format.ts";
-import { chartAxis, chartColors } from "@/lib/tokens.ts";
+import { chartAxis, chartColors, chartMotion } from "@/lib/tokens.ts";
 import type { ActivitySplit } from "@/features/activities/types.ts";
 import { ChartCard, type ChartStatus } from "./chart-card.tsx";
+import { ChartDefs, useChartIds } from "./chart-defs.tsx";
 import { ChartTooltip } from "./chart-tooltip.tsx";
 
 interface Datum {
@@ -19,8 +20,9 @@ function splitPace(split: ActivitySplit): number {
   return split.time / (split.distance / 1000);
 }
 
-/** Pace per kilometer split. Taller bars are faster; the fastest split is bronze. */
+/** Pace per kilometer split. Taller bars are faster; the fastest split is brand. */
 export function SplitsChart({ splits, status, height = 220, className }: { splits: ActivitySplit[] | null; status: ChartStatus; height?: number; className?: string }) {
+  const ids = useChartIds();
   const paces = (splits ?? []).map(splitPace);
   const slowest = Math.max(...paces, 0);
   const fastest = Math.min(...paces, Infinity);
@@ -43,10 +45,11 @@ export function SplitsChart({ splits, status, height = 220, className }: { split
     >
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 8 }} barCategoryGap="18%">
+          <ChartDefs ids={ids} />
           <XAxis dataKey="index" {...chartAxis} interval="preserveStartEnd" minTickGap={10} />
           <YAxis hide domain={[0, "dataMax"]} />
           <Tooltip
-            cursor={{ fill: "rgba(182, 191, 194, 0.06)" }}
+            cursor={{ fill: "rgb(var(--line-rgb)/0.06)", radius: 6 }}
             content={(props) => (
               <ChartTooltip<Datum>
                 active={props.active}
@@ -54,7 +57,7 @@ export function SplitsChart({ splits, status, height = 220, className }: { split
                 render={(item) => ({
                   title: item.split.distance < 1000 ? `Final ${(item.split.distance / 1000).toFixed(2)} km` : `Kilometer ${item.index}`,
                   rows: [
-                    { label: "Pace", value: `${formatClock(item.pace)} /km`, color: chartColors.primary },
+                    { label: "Pace", value: `${formatClock(item.pace)} /km`, color: item.fastest ? chartColors.primary : chartColors.secondary },
                     ...(item.split.averageHeartrate != null ? [{ label: "Heart rate", value: `${item.split.averageHeartrate} bpm` }] : []),
                     ...(item.split.elevationGain != null ? [{ label: "Elevation gain", value: `${item.split.elevationGain} m` }] : []),
                   ],
@@ -62,9 +65,13 @@ export function SplitsChart({ splits, status, height = 220, className }: { split
               />
             )}
           />
-          <Bar dataKey="height" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+          <Bar dataKey="height" radius={[6, 6, 2, 2]} {...chartMotion}>
             {data.map((item) => (
-              <Cell key={item.index} fill={item.fastest ? chartColors.primary : chartColors.secondary} fillOpacity={item.fastest ? 1 : 0.5} />
+              <Cell
+                key={item.index}
+                fill={item.fastest ? `url(#${ids.bar})` : `url(#${ids.barMuted})`}
+                style={item.fastest ? { filter: "drop-shadow(0 0 8px rgb(var(--brand-rgb)/0.25))" } : undefined}
+              />
             ))}
           </Bar>
         </BarChart>

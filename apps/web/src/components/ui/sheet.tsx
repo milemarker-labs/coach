@@ -15,7 +15,7 @@ export function SheetContent({ className, children, ...props }: ComponentProps<t
       <DialogPrimitive.Overlay className="animate-overlay-in fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px]" />
       <DialogPrimitive.Content
         className={cn(
-          "animate-drawer-in fixed inset-y-0 left-0 z-50 flex w-[17rem] max-w-[85vw] flex-col border-r border-border bg-sidebar outline-none",
+          "animate-drawer-in fixed inset-y-0 left-0 z-50 flex w-[18rem] max-w-[85vw] flex-col border-r border-border bg-sidebar/95 backdrop-blur-xl outline-none",
           className,
         )}
         {...props}

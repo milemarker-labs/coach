@@ -20,12 +20,20 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-3 px-6 py-10 text-center", className)}>
-      <div className={cn("flex size-10 items-center justify-center rounded-full", tone === "danger" ? "bg-danger/12 text-danger" : "bg-surface-2 text-muted-foreground")}>
-        <Icon className="size-5" aria-hidden="true" />
+    <div className={cn("animate-fade-in flex flex-col items-center justify-center gap-3 px-6 py-10 text-center", className)}>
+      <div className="relative">
+        <div className={cn("absolute inset-0 rounded-2xl blur-xl", tone === "danger" ? "bg-danger/25" : "bg-pulse/20")} aria-hidden="true" />
+        <div
+          className={cn(
+            "relative flex size-12 animate-float items-center justify-center rounded-2xl ring-1 ring-inset",
+            tone === "danger" ? "bg-danger/12 text-danger ring-danger/25" : "bg-surface-2 text-muted-foreground ring-border",
+          )}
+        >
+          <Icon className="size-5" aria-hidden="true" />
+        </div>
       </div>
       <div className="space-y-1">
-        <p className="text-sm font-medium">{title}</p>
+        <p className="font-display text-sm font-semibold">{title}</p>
         {description ? <p className="mx-auto max-w-sm text-xs text-muted-foreground">{description}</p> : null}
       </div>
       {action}

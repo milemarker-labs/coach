@@ -69,12 +69,9 @@ aiRoutes.post("/chat", async (c) => {
   await db.insert(aiMessages).values({ conversationId: conversation.id, role: "user", content: parsed.data.message, sources: [] });
   const history = await loadHistory(db, conversation.id);
   const context = await buildCoachContext(db, c.var.userId, new Date(), "Asia/Kolkata");
-  const sources = context.recentActivities.map((activity) => ({
-    id: activity.id,
-    name: activity.name,
-    sport: activity.sport,
-    startedAt: activity.startedAt,
-  }));
+  // Replies no longer carry the list of activities the model was shown. It was every recent
+  // session on every answer, which read as noise. The field stays in the contract, empty.
+  const sources: { id: string; name: string; sport: string; startedAt: string }[] = [];
   const messages = buildCoachMessages(context, history);
   const provider = endpoint.provider;
   const connectionString = databaseConnectionString(c.env);

@@ -26,6 +26,18 @@ export interface CoachActivityFact {
   averageHeartRate: number | null;
 }
 
+/** The Marker fitness score and today's direction, computed from the stored history. */
+export interface CoachMarkerFact {
+  name: string;
+  value: number;
+  band: string;
+  delta7: number | null;
+  components: { label: string; value: number | null; detail: string }[];
+  /** `kind` is rest, easy, steady, quality or long. */
+  call: { kind: string; title: string; reason: string; minutes: number | null };
+  directions: { title: string; detail: string }[];
+}
+
 export interface CoachContext {
   /** Calendar date in the athlete timezone, `YYYY-MM-DD`. */
   today: string;
@@ -36,6 +48,8 @@ export interface CoachContext {
   last7Days: SportWindow[];
   previous7Days: SportWindow[];
   recentActivities: CoachActivityFact[];
+  /** Optional so older callers and tests keep working. */
+  marker?: CoachMarkerFact;
 }
 
 export interface AIProvider {

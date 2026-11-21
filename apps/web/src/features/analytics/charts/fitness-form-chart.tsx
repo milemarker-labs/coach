@@ -1,10 +1,11 @@
 import { TrendingUp } from "lucide-react";
-import { CartesianGrid, ComposedChart, Legend, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { chartAxis, chartColors } from "@/lib/tokens.ts";
+import { Area, CartesianGrid, ComposedChart, Legend, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { chartAxis, chartColors, chartMotion } from "@/lib/tokens.ts";
 import { formatDayLong, formatDayShort } from "../calculations/dates.ts";
 import type { FitnessPoint } from "../calculations/load.ts";
 import { formatSigned } from "../calculations/observations.ts";
 import { ChartCard, type ChartStatus } from "./chart-card.tsx";
+import { ChartDefs, haloDot, useChartIds } from "./chart-defs.tsx";
 import { ChartTooltip } from "./chart-tooltip.tsx";
 
 export function FitnessFormChart({
@@ -18,6 +19,7 @@ export function FitnessFormChart({
   height?: number;
   className?: string;
 }) {
+  const ids = useChartIds();
   const hasData = data.some((point) => point.fitness > 0.5 || point.fatigue > 0.5);
   return (
     <ChartCard
@@ -33,7 +35,8 @@ export function FitnessFormChart({
     >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
-          <CartesianGrid vertical={false} stroke={chartColors.grid} />
+          <ChartDefs ids={ids} />
+          <CartesianGrid vertical={false} stroke={chartColors.grid} strokeDasharray="2 6" />
           <XAxis dataKey="day" {...chartAxis} tickFormatter={formatDayShort} minTickGap={32} />
           <YAxis {...chartAxis} width={40} allowDecimals={false} />
           <ReferenceLine y={0} stroke={chartColors.cursor} strokeDasharray="3 3" />
@@ -41,12 +44,12 @@ export function FitnessFormChart({
             verticalAlign="top"
             align="right"
             height={24}
-            iconType="plainline"
-            iconSize={12}
+            iconType="circle"
+            iconSize={7}
             formatter={(value: string) => <span className="text-xs text-muted-foreground">{value}</span>}
           />
           <Tooltip
-            cursor={{ stroke: chartColors.cursor }}
+            cursor={{ stroke: chartColors.cursor, strokeDasharray: "3 3" }}
             content={(props) => (
               <ChartTooltip<FitnessPoint>
                 active={props.active}
@@ -62,17 +65,29 @@ export function FitnessFormChart({
               />
             )}
           />
-          <Line name="Fitness" type="monotone" dataKey="fitness" stroke={chartColors.primary} strokeWidth={2} dot={false} isAnimationActive={false} />
-          <Line name="Fatigue" type="monotone" dataKey="fatigue" stroke={chartColors.secondary} strokeWidth={1.5} dot={false} isAnimationActive={false} />
+          <Area
+            name="Fitness"
+            type="monotone"
+            dataKey="fitness"
+            stroke={chartColors.primary}
+            strokeWidth={2.5}
+            fill={`url(#${ids.area})`}
+            filter={`url(#${ids.glow})`}
+            dot={false}
+            activeDot={haloDot(chartColors.primary)}
+            {...chartMotion}
+          />
+          <Line name="Fatigue" type="monotone" dataKey="fatigue" stroke={chartColors.secondary} strokeWidth={1.75} dot={false} activeDot={haloDot(chartColors.secondary, 4)} {...chartMotion} />
           <Line
             name="Form"
             type="monotone"
             dataKey="form"
             stroke={chartColors.tertiary}
             strokeWidth={1.5}
-            strokeDasharray="4 3"
+            strokeDasharray="4 4"
             dot={false}
-            isAnimationActive={false}
+            activeDot={haloDot(chartColors.tertiary, 4)}
+            {...chartMotion}
           />
         </ComposedChart>
       </ResponsiveContainer>
