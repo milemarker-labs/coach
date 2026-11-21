@@ -7,7 +7,8 @@ export interface OllamaOptions {
 }
 
 /** Enough room for a full coaching reply. The server default was cutting answers off mid-sentence. */
-const GENERATION = { num_predict: 1536 };
+/** A little warmth so replies read like a person, not a report. Still low enough to stay on the facts. */
+const GENERATION = { num_predict: 1536, temperature: 0.45, top_p: 0.9, repeat_penalty: 1.08 };
 
 export function createOllamaProvider(options: OllamaOptions): AIProvider {
   const baseUrl = options.baseUrl.replace(/\/$/, "");

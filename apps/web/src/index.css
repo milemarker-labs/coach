@@ -1,61 +1,154 @@
 @import "tailwindcss";
 
+/* light: and dark: follow the app theme attribute, not only the system setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
 /*
- * Titanium Noir design tokens.
+ * Dusk design tokens, in two modes.
+ *  - brand (indigo): actions, the active state, runs and fitness
+ *  - pulse (rose): the AI coach, strength and fatigue
+ *  - flow (aqua): rides and form
+ *  - trail (orange): hikes
+ * Dark mode sits on blue-ink; light mode on warm paper, never pure white.
+ * The theme is chosen by `data-theme` on <html>, set before first paint by the script in
+ * index.html (stored choice, else the system setting) and changed by the theme toggle.
+ * `--*-rgb` channels feed glows and tints as rgb(var(--x-rgb)/alpha), so they follow the mode.
  * Every color, radius and font in the interface comes from here.
  * Charts read the same variables through src/lib/tokens.ts.
  */
 :root {
-  /* Surfaces: graphite and gunmetal */
-  --bg: #101316;
-  --sidebar: #191e22;
-  --surface: #22292e;
-  --surface-2: #30383d;
-  --input: #191e22;
+  /* Surfaces */
+  --bg: #0b0d17;
+  --sidebar: #0f1220;
+  --surface: #141828;
+  --surface-2: #1c2135;
+  --surface-3: #272d45;
+  --input: #11152a;
 
-  /* Metallic neutrals */
-  --titanium: #b6bfc2;
-  --platinum: #e8e5dc;
-  --text: var(--platinum);
-  --text-secondary: var(--titanium);
-  --text-muted: #858f94;
+  /* Text */
+  --text: #eef0fa;
+  --text-secondary: #a6abc6;
+  --text-muted: #6f7593;
 
-  /* Borders */
-  --border: rgba(182, 191, 194, 0.14);
-  --border-hover: rgba(182, 191, 194, 0.28);
+  /* Lines: borders, gridlines, dots */
+  --line-rgb: 160 170 220;
+  --border: rgb(var(--line-rgb) / 0.12);
+  --border-hover: rgb(var(--line-rgb) / 0.26);
+  --grid: rgb(var(--line-rgb) / 0.09);
 
-  /* Brand: champagne bronze and antique brass */
-  --bronze: #b89a69;
-  --bronze-hover: #c7ac7c;
-  --brass: #927653;
-  --bronze-subtle: rgba(184, 154, 105, 0.12);
-  --bronze-text: #d0b685;
-  /* Brushed-metal finish. Reserved for the primary action, the active nav marker and small brand marks. */
-  --metal-bronze: linear-gradient(180deg, #c4a674 0%, #b89a69 55%, #ab8e5f 100%);
-  --metal-bronze-hover: linear-gradient(180deg, #cdb182 0%, #c1a373 55%, #b59868 100%);
+  /* Brand */
+  --brand: #7c6cff;
+  --brand-rgb: 124 108 255;
+  --brand-hover: #8f81ff;
+  --brand-subtle: rgb(var(--brand-rgb) / 0.14);
+  --brand-text: #b8afff;
+  --on-brand: #ffffff;
+  --pulse: #ff6f91;
+  --pulse-rgb: 255 111 145;
+  --pulse-subtle: rgb(var(--pulse-rgb) / 0.13);
+  --flow: #2ec4b6;
+  --flow-rgb: 46 196 182;
+  --trail: #ff9f43;
+  --brand-gradient: linear-gradient(135deg, #8f7dff 0%, #7c6cff 50%, #6a57f5 100%);
+  --brand-gradient-hover: linear-gradient(135deg, #9d8eff 0%, #8a7bff 50%, #7864f7 100%);
+  /* The Marker ring and other hero moments: flow through brand into pulse, cool to warm. */
+  --spectrum: linear-gradient(120deg, #2ec4b6 0%, #7c6cff 50%, #ff6f91 100%);
 
   /* Semantic */
-  --success: #83a98b;
-  --warning: #d2a45f;
-  --danger: #d77d76;
-  --info: #83a9ba;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --warning-rgb: 251 191 36;
+  --danger: #f4607a;
+  --info: #60a5fa;
   --strava: #fc4c02;
 
-  /* Chart gridlines */
-  --grid: rgba(182, 191, 194, 0.09);
+  /* Shadows: pure black on ink, a soft tinted ink on paper */
+  --shade-rgb: 0 0 0;
+  --shade-alpha: 1;
 
-  --radius: 0.75rem;
+  /* Ambient light behind the app */
+  --aurora-strength: 1;
+  --grain-opacity: 0.6;
+
+  --radius: 0.9rem;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   color-scheme: dark;
+}
+
+/* Light: warm paper. Hues are deepened so text, icons and chart lines keep their contrast. */
+:root[data-theme="light"] {
+  --bg: #f2f0eb;
+  --sidebar: #ebe8e1;
+  --surface: #faf8f4;
+  --surface-2: #efece5;
+  --surface-3: #e3dfd6;
+  --input: #f7f5f0;
+
+  --text: #191b2e;
+  --text-secondary: #545870;
+  --text-muted: #85889a;
+
+  --line-rgb: 40 42 70;
+  --border: rgb(var(--line-rgb) / 0.11);
+  --border-hover: rgb(var(--line-rgb) / 0.22);
+  --grid: rgb(var(--line-rgb) / 0.08);
+
+  --brand: #5b4be0;
+  --brand-rgb: 91 75 224;
+  --brand-hover: #4c3dd0;
+  --brand-subtle: rgb(var(--brand-rgb) / 0.1);
+  --brand-text: #4b3cc9;
+  --on-brand: #ffffff;
+  --pulse: #d63d64;
+  --pulse-rgb: 214 61 100;
+  --pulse-subtle: rgb(var(--pulse-rgb) / 0.1);
+  --flow: #0f8f84;
+  --flow-rgb: 15 143 132;
+  --trail: #d0681a;
+  --brand-gradient: linear-gradient(135deg, #6c5df0 0%, #5b4be0 50%, #4a3bcf 100%);
+  --brand-gradient-hover: linear-gradient(135deg, #5f50e6 0%, #4f3fd6 50%, #4132c4 100%);
+  --spectrum: linear-gradient(120deg, #0f8f84 0%, #5b4be0 50%, #d63d64 100%);
+
+  --success: #14935c;
+  --warning: #b7791f;
+  --warning-rgb: 183 121 31;
+  --danger: #cf3653;
+  --info: #2b6fd6;
+
+  --shade-rgb: 52 48 84;
+  --shade-alpha: 0.35;
+
+  --aurora-strength: 0.7;
+  --grain-opacity: 0.25;
+
+  color-scheme: light;
+}
+
+/* A brief cross-fade when the theme is switched. Added and removed by the toggle. */
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition:
+    background-color 260ms ease,
+    border-color 260ms ease,
+    color 260ms ease,
+    fill 260ms ease,
+    stroke 260ms ease !important;
 }
 
 @theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Unbounded: wide and bold, for headings and the big numbers. Inter keeps body text readable. */
+  --font-display: "Unbounded", "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--bg);
   --color-sidebar: var(--sidebar);
   --color-card: var(--surface);
   --color-card-foreground: var(--text);
   --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-input: var(--input);
   --color-popover: var(--surface-2);
   --color-popover-foreground: var(--text);
@@ -63,19 +156,20 @@
   --color-foreground: var(--text);
   --color-muted-foreground: var(--text-secondary);
   --color-faint: var(--text-muted);
-  --color-platinum: var(--platinum);
-  --color-titanium: var(--titanium);
 
-  --color-primary: var(--bronze);
-  --color-primary-hover: var(--bronze-hover);
-  --color-primary-subtle: var(--bronze-subtle);
-  --color-primary-foreground: #14110d;
-  --color-brass: var(--brass);
+  --color-primary: var(--brand);
+  --color-primary-hover: var(--brand-hover);
+  --color-primary-subtle: var(--brand-subtle);
+  --color-primary-foreground: var(--on-brand);
+  --color-pulse: var(--pulse);
+  --color-pulse-subtle: var(--pulse-subtle);
+  --color-flow: var(--flow);
+  --color-trail: var(--trail);
   --color-secondary: var(--surface-2);
   --color-secondary-foreground: var(--text);
   --color-muted: var(--surface-2);
-  --color-accent: var(--bronze-subtle);
-  --color-accent-foreground: var(--bronze-text);
+  --color-accent: var(--brand-subtle);
+  --color-accent-foreground: var(--brand-text);
 
   --color-success: var(--success);
   --color-warning: var(--warning);
@@ -84,14 +178,24 @@
   --color-info: var(--info);
   --color-strava: var(--strava);
 
+  --color-shade: rgb(var(--shade-rgb) / var(--shade-alpha));
   --color-border: var(--border);
   --color-border-hover: var(--border-hover);
-  --color-ring: var(--bronze);
+  --color-ring: var(--brand);
 
   --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 3px);
+  --radius-sm: calc(var(--radius) - 6px);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
+
+  --animate-shimmer: coach-shimmer 1.8s linear infinite;
+  --animate-aurora: coach-aurora 22s ease-in-out infinite alternate;
+  --animate-float: coach-float 6s ease-in-out infinite;
+  --animate-spin-slow: spin 14s linear infinite;
+  --animate-ping-soft: coach-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-gradient-pan: coach-gradient-pan 6s linear infinite;
+  --animate-orb: coach-orb 3.2s ease-in-out infinite;
 }
 
 @layer base {
@@ -118,28 +222,29 @@
   h1,
   h2,
   h3 {
-    color: var(--platinum);
+    color: var(--text);
+    font-family: var(--font-display);
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
   }
 
   ::selection {
-    background: rgba(184, 154, 105, 0.3);
+    background: rgb(var(--brand-rgb) / 0.28);
+    color: var(--text);
   }
 
   :focus-visible {
-    outline: 2px solid var(--bronze);
+    outline: 2px solid var(--brand);
     outline-offset: 2px;
   }
 
   input[type="date"] {
-    color-scheme: dark;
+    color-scheme: inherit;
   }
 
-  /* Slim scrollbars that sit quietly on the graphite surfaces */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(182, 191, 194, 0.25) transparent;
+    scrollbar-color: rgb(var(--line-rgb)/0.22) transparent;
   }
 }
 
@@ -155,18 +260,197 @@
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum", "cv11", "ss03";
   }
-  .bg-metal-bronze {
-    background-image: var(--metal-bronze);
+  .font-display {
+    font-family: var(--font-display);
   }
-  .hover\:bg-metal-bronze-hover:hover {
-    background-image: var(--metal-bronze-hover);
+  .bg-brand-gradient {
+    background-image: var(--brand-gradient);
+  }
+  .hover\:bg-brand-gradient-hover:hover {
+    background-image: var(--brand-gradient-hover);
+  }
+  .bg-spectrum {
+    background-image: var(--spectrum);
+  }
+  .text-spectrum {
+    background-image: var(--spectrum);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-brand-gradient {
+    background-image: linear-gradient(100deg, var(--text) 0%, var(--brand-text) 55%, var(--brand) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Frosted panel for floating chrome: headers, bars, palettes. */
+  .glass {
+    background: color-mix(in oklab, var(--sidebar) 72%, transparent);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  }
+  .glow-brand {
+    box-shadow:
+      0 0 0 1px rgb(var(--brand-rgb)/0.35),
+      0 8px 32px -8px rgb(var(--brand-rgb)/0.25);
+  }
+  .glow-pulse {
+    box-shadow: 0 10px 40px -12px rgb(var(--pulse-rgb)/0.35);
+  }
+  /*
+   * A hairline gradient border, drawn with a mask so the fill stays transparent.
+   * The default `position: relative` sits in :where() (zero specificity) so an explicit
+   * `fixed` or `absolute` class on the same element always wins. Without that, the command
+   * palette fell out of `fixed` into the page flow.
+   */
+  :where(.ring-spectrum) {
+    position: relative;
+  }
+  .ring-spectrum::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--spectrum);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+  /* Cards light up under the pointer. --mx/--my are set by the Card component. */
+  /* Same zero-specificity default as .ring-spectrum, so positioning classes win. */
+  :where(.spotlight) {
+    position: relative;
+  }
+  .spotlight {
+    isolation: isolate;
+  }
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -40%), rgb(var(--brand-rgb)/0.07), transparent 45%);
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+  }
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+  .grain {
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .bg-dots {
+    background-image: radial-gradient(rgb(var(--line-rgb)/0.13) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  }
+  .mask-radial {
+    mask-image: radial-gradient(ellipse at center, black 35%, transparent 75%);
+  }
+}
+
+/* Ambient light behind the whole app. Fixed, so it never scrolls with content. */
+.app-aurora {
+  position: fixed;
+  inset: -20vmax;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40vmax 30vmax at 12% 8%, rgb(var(--brand-rgb) / 0.16), transparent 60%),
+    radial-gradient(36vmax 26vmax at 92% 12%, rgb(var(--flow-rgb) / 0.1), transparent 60%),
+    radial-gradient(44vmax 30vmax at 70% 105%, rgb(var(--pulse-rgb) / 0.09), transparent 60%);
+  opacity: var(--aurora-strength);
+  animation: coach-aurora 26s ease-in-out infinite alternate;
+}
+
+@keyframes coach-aurora {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(2vmax, -1.5vmax, 0) rotate(4deg) scale(1.05);
+  }
+  100% {
+    transform: translate3d(-2vmax, 1vmax, 0) rotate(-3deg) scale(1.02);
+  }
+}
+
+@keyframes coach-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes coach-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes coach-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes coach-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  80%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes coach-gradient-pan {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+/* Transform only. Animating `filter` here would replace the blur-* filter on the same element
+   and turn soft glows into hard-edged disks. */
+@keyframes coach-orb {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
   }
 }
 
 @keyframes coach-fade-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -198,8 +482,19 @@
   }
 }
 
+@keyframes coach-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .animate-fade-in {
-  animation: coach-fade-in 180ms ease-out both;
+  animation: coach-fade-in 320ms var(--ease-out-expo) both;
 }
 
 .animate-caret {
@@ -207,11 +502,15 @@
 }
 
 .animate-drawer-in {
-  animation: coach-drawer-in 200ms ease-out both;
+  animation: coach-drawer-in 320ms var(--ease-out-expo) both;
 }
 
 .animate-overlay-in {
-  animation: coach-overlay-in 150ms ease-out both;
+  animation: coach-overlay-in 200ms ease-out both;
+}
+
+.animate-pop-in {
+  animation: coach-pop-in 260ms var(--ease-out-expo) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -219,6 +518,15 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Phones: the app shell scrolls its content pane, so the document should not rubber-band either. */
+@media (max-width: 767px) {
+  html,
+  body {
+    overscroll-behavior: none;
   }
 }

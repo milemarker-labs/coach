@@ -19,6 +19,7 @@ The response is JSON, `Cache-Control: public, max-age=60`, and it does not requi
 | `to` | Last day of the window, `YYYY-MM-DD`, inclusive |
 | `activities` | Sessions in that window, newest first, at most 100 |
 | `fitness` | Last 90 local days of fitness, fatigue, and form. One point per day, oldest first |
+| `score` | The Marker score. Optional: absent from older deployments |
 
 Each activity:
 
@@ -47,6 +48,20 @@ Each fitness point:
 | `form` | Fitness minus fatigue, one decimal |
 
 Daily load is the Strava suffer score, or one point per moving minute when a session has no suffer score. Days before the 90-day window warm those averages and are not listed. The page shows the current fitness, fatigue, and form, the change over seven days, and the three lines together.
+
+The `score` object:
+
+| Field | Meaning |
+| --- | --- |
+| `name` | The score's name, `Marker` |
+| `value` | 0-100 for the last day of the window |
+| `band` | `{ key, label }`: Getting started (0+), Building (25+), Steady (45+), Strong (65+), Peak (80+) |
+| `delta7` | Change against seven days earlier, or null |
+| `confidence` | `low`, `medium`, or `high`, from how much history and heart rate there is |
+| `components` | Base, consistency, balance, momentum, and efficiency: `{ key, label, value, detail }`, value 0-100 or null when not measurable |
+| `trend` | Up to 90 `{ day, value }` points, oldest first |
+
+The Marker uses up to a year of stored activities; only the number, its parts, and its trend are published. The daily call and directions stay in the private archive.
 
 The page groups those sessions by local day and shows four totals for the window: how many sessions, distance in kilometers, moving time, and elevation climbed. A day with no session is a rest day. The home page previews at most three of the same sessions and links here.
 

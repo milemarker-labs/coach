@@ -2,10 +2,12 @@ import { Mountain, Route } from "lucide-react";
 import type { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatHoursMinutes } from "@/lib/format.ts";
-import { chartAxis, chartColors } from "@/lib/tokens.ts";
+import { AnimatedValue } from "@/components/motion/animated-number.tsx";
+import { chartAxis, chartColors, chartMotion } from "@/lib/tokens.ts";
 import { formatDayLong, formatMonthShort } from "../calculations/dates.ts";
 import type { BucketUnit, VolumeBucket } from "../calculations/volume.ts";
 import { ChartCard, type ChartStatus } from "./chart-card.tsx";
+import { ChartDefs, useChartIds } from "./chart-defs.tsx";
 import { ChartTooltip } from "./chart-tooltip.tsx";
 
 export type VolumeMetric = "distance" | "elevation" | "time";
@@ -27,17 +29,19 @@ interface Datum extends VolumeBucket {
 }
 
 function VolumeBarChart({ data, metric, unit }: { data: VolumeBucket[]; metric: VolumeMetric; unit: BucketUnit }) {
+  const ids = useChartIds();
   const config = metrics[metric];
   const rows: Datum[] = data.map((bucket) => ({ ...bucket, value: config.read(bucket) }));
   const last = rows.length - 1;
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: -8 }} barCategoryGap="22%">
-        <CartesianGrid vertical={false} stroke={chartColors.grid} />
+        <ChartDefs ids={ids} />
+        <CartesianGrid vertical={false} stroke={chartColors.grid} strokeDasharray="2 6" />
         <XAxis dataKey="label" {...chartAxis} interval="preserveStartEnd" minTickGap={14} />
         <YAxis {...chartAxis} width={40} allowDecimals={false} />
         <Tooltip
-          cursor={{ fill: "rgba(182, 191, 194, 0.06)" }}
+          cursor={{ fill: "rgb(var(--line-rgb)/0.06)", radius: 6 }}
           content={(props) => (
             <ChartTooltip<Datum>
               active={props.active}
@@ -52,9 +56,13 @@ function VolumeBarChart({ data, metric, unit }: { data: VolumeBucket[]; metric: 
             />
           )}
         />
-        <Bar dataKey="value" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+        <Bar dataKey="value" radius={[6, 6, 2, 2]} {...chartMotion}>
           {rows.map((row, index) => (
-            <Cell key={row.key} fill={chartColors.primary} fillOpacity={index === last ? 1 : 0.55} />
+            <Cell
+              key={row.key}
+              fill={index === last ? `url(#${ids.bar})` : `url(#${ids.barMuted})`}
+              style={index === last ? { filter: "drop-shadow(0 0 10px rgb(var(--brand-rgb)/0.25))" } : undefined}
+            />
           ))}
         </Bar>
       </BarChart>
@@ -77,9 +85,9 @@ function hasVolume(data: VolumeBucket[], metric: VolumeMetric): boolean {
 function headline(label: string, value: string, caption: string) {
   return (
     <div className="flex items-baseline gap-2">
-      <span className="num text-3xl font-bold tracking-tight">{value}</span>
+      <AnimatedValue text={value} className="font-display text-3xl font-semibold tracking-tight" />
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="ml-auto text-xs text-muted-foreground">{caption}</span>
+      {caption ? <span className="ml-auto rounded-full bg-surface-2 px-2.5 py-0.5 text-xs text-muted-foreground ring-1 ring-border ring-inset">{caption}</span> : null}
     </div>
   );
 }

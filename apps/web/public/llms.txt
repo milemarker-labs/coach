@@ -10,7 +10,7 @@ Signed-in routes (`/activities`, `/training`, `/insights`, `/coach`, `/sync`, `/
 
 - [Home](https://coach.milemarkerlabs.com/index.md): What Coach is, who can sign in, and what a visitor can read
 - [Journal](https://coach.milemarkerlabs.com/mangesh.md): How to read the public week, including the JSON fields
-- [Journal JSON](https://coach.milemarkerlabs.com/api/journal/mangesh): The last seven days, plus 90 days of fitness, fatigue, and form. No authentication. Cached for 60 seconds.
+- [Journal JSON](https://coach.milemarkerlabs.com/api/journal/mangesh): The last seven days, plus 90 days of fitness, fatigue, and form, and the Marker score (0-100) with its parts and 90-day trend. No authentication. Cached for 60 seconds.
 
 ## Optional
 

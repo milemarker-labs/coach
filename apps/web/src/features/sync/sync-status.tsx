@@ -1,4 +1,5 @@
 import { AlertTriangle, Check, RefreshCw } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/button.tsx";
 import { useDataMode } from "@/data/mode.ts";
 import { useSyncStatus } from "@/data/queries.ts";
@@ -38,10 +39,22 @@ export function SyncStatus({ className }: { className?: string }) {
         onClick={sync.start}
         disabled={busy || sync.blockedReason != null}
         title={sync.blockedReason ?? undefined}
-        className={cn(sync.phase === "success" && "border-success/40 text-success", sync.phase === "error" && "border-danger/40 text-danger")}
+        className={cn("min-w-32", sync.phase === "success" && "border-success/40 text-success", sync.phase === "error" && "border-danger/40 text-danger")}
       >
-        <Icon className={cn("size-4", busy && "animate-spin")} aria-hidden="true" />
-        {labels[sync.phase]}
+        {busy ? <span className="absolute inset-0 animate-shimmer bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)] bg-[length:200%_100%]" aria-hidden="true" /> : null}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={sync.phase}
+            className="relative flex items-center gap-2"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <Icon className={cn("size-4", busy && "animate-spin")} aria-hidden="true" />
+            {labels[sync.phase]}
+          </motion.span>
+        </AnimatePresence>
       </Button>
       <p
         className={cn("text-xs", sync.phase === "error" ? "text-danger" : sync.phase === "success" ? "text-success" : "text-muted-foreground")}

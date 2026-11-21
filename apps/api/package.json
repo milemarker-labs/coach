@@ -9,7 +9,8 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "coach:eval": "node scripts/coach-eval.ts"
   },
   "dependencies": {
     "@coach/ai": "workspace:*",
